@@ -1,12 +1,7 @@
 export type VehicleType = "car" | "motorcycle";
 export type OdometerUnit = "mi" | "km" | "hr";
 
-export type WorkOrderStatus =
-  | "open"
-  | "in_progress"
-  | "waiting_parts"
-  | "done"
-  | "cancelled";
+export type WorkOrderStatus = "open" | "in_progress" | "waiting_parts" | "done" | "cancelled";
 export type WorkOrderPriority = "low" | "medium" | "high" | "critical";
 export type PartStatus = "needed" | "ordered" | "received" | "installed";
 export type CustomFieldType = "text" | "number" | "date" | "select" | "boolean";
@@ -127,11 +122,7 @@ export const PART_STATUS_LABELS: Record<PartStatus, string> = {
   installed: "Installed",
 };
 
-export const OPEN_STATUSES: WorkOrderStatus[] = [
-  "open",
-  "in_progress",
-  "waiting_parts",
-];
+export const OPEN_STATUSES: WorkOrderStatus[] = ["open", "in_progress", "waiting_parts"];
 export const CLOSED_STATUSES: WorkOrderStatus[] = ["done", "cancelled"];
 
 export type VendorKind = "parts" | "online" | "shop" | "dealer" | "other";

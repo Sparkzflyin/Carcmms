@@ -2,35 +2,88 @@
 
 import { Car, ImagePlus, Motorbike, Plus, ScanLine, X } from "lucide-react";
 import { useActionState, useRef, useState, useTransition } from "react";
-import {
-  Button,
-  Card,
-  ErrorNote,
-  Field,
-  Input,
-  Select,
-  Textarea,
-  cx,
-} from "@/components/ui";
+import { Button, Card, ErrorNote, Field, Input, Select, Textarea, cx } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import type { CustomFieldDefinition, CustomFieldType, Vehicle, VehicleType } from "@/lib/types";
 import { createCustomField, lookupVin, saveVehicle, type FormState } from "./actions";
 
 const CAR_MAKES = [
-  "Acura", "Alfa Romeo", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge",
-  "Fiat", "Ford", "Genesis", "GMC", "Honda", "Hyundai", "Infiniti", "Jaguar", "Jeep", "Kia",
-  "Land Rover", "Lexus", "Lincoln", "Mazda", "Mercedes-Benz", "Mini", "Mitsubishi", "Nissan",
-  "Polestar", "Porsche", "Ram", "Rivian", "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo",
+  "Acura",
+  "Alfa Romeo",
+  "Audi",
+  "BMW",
+  "Buick",
+  "Cadillac",
+  "Chevrolet",
+  "Chrysler",
+  "Dodge",
+  "Fiat",
+  "Ford",
+  "Genesis",
+  "GMC",
+  "Honda",
+  "Hyundai",
+  "Infiniti",
+  "Jaguar",
+  "Jeep",
+  "Kia",
+  "Land Rover",
+  "Lexus",
+  "Lincoln",
+  "Mazda",
+  "Mercedes-Benz",
+  "Mini",
+  "Mitsubishi",
+  "Nissan",
+  "Polestar",
+  "Porsche",
+  "Ram",
+  "Rivian",
+  "Subaru",
+  "Tesla",
+  "Toyota",
+  "Volkswagen",
+  "Volvo",
 ];
 const MOTORCYCLE_MAKES = [
-  "Aprilia", "BMW", "Can-Am", "Ducati", "Harley-Davidson", "Honda", "Husqvarna", "Indian",
-  "Kawasaki", "KTM", "Moto Guzzi", "Royal Enfield", "Suzuki", "Triumph", "Yamaha", "Zero",
+  "Aprilia",
+  "BMW",
+  "Can-Am",
+  "Ducati",
+  "Harley-Davidson",
+  "Honda",
+  "Husqvarna",
+  "Indian",
+  "Kawasaki",
+  "KTM",
+  "Moto Guzzi",
+  "Royal Enfield",
+  "Suzuki",
+  "Triumph",
+  "Yamaha",
+  "Zero",
 ];
 
 type Values = Record<
-  | "nickname" | "year" | "make" | "model" | "trim" | "vin" | "body_style" | "engine"
-  | "transmission" | "drivetrain" | "fuel_type" | "color" | "license_plate" | "odometer"
-  | "odometer_unit" | "purchase_date" | "purchase_price" | "purchase_odometer" | "notes",
+  | "nickname"
+  | "year"
+  | "make"
+  | "model"
+  | "trim"
+  | "vin"
+  | "body_style"
+  | "engine"
+  | "transmission"
+  | "drivetrain"
+  | "fuel_type"
+  | "color"
+  | "license_plate"
+  | "odometer"
+  | "odometer_unit"
+  | "purchase_date"
+  | "purchase_price"
+  | "purchase_odometer"
+  | "notes",
   string
 >;
 
@@ -123,7 +176,9 @@ export function VehicleForm({
         drivetrain: result.drivetrain || v.drivetrain,
         fuel_type: result.fuel_type || v.fuel_type,
       }));
-      setVinStatus({ ok: `Found: ${[result.year, result.make, result.model].filter(Boolean).join(" ")}` });
+      setVinStatus({
+        ok: `Found: ${[result.year, result.make, result.model].filter(Boolean).join(" ")}`,
+      });
     });
   }
 
@@ -164,14 +219,20 @@ export function VehicleForm({
               )}
             >
               <Icon className={cx("size-7", type === value && "text-accent")} strokeWidth={1.5} />
-              <span className="font-display text-lg font-bold tracking-wide uppercase">{label}</span>
+              <span className="font-display text-lg font-bold tracking-wide uppercase">
+                {label}
+              </span>
             </button>
           ))}
         </div>
 
         {/* VIN */}
         <Card className="p-5">
-          <FormSectionTitle n={1} title="VIN autofill" sub="Optional. Pulls specs from the NHTSA database." />
+          <FormSectionTitle
+            n={1}
+            title="VIN autofill"
+            sub="Optional. Pulls specs from the NHTSA database."
+          />
           <div className="flex gap-2">
             <Input
               name="vin"
@@ -198,7 +259,11 @@ export function VehicleForm({
             </Button>
           </div>
           {vinStatus.error && <p className="mt-2 text-sm text-danger">{vinStatus.error}</p>}
-          {vinStatus.ok && <p className="mt-2 text-sm font-semibold text-ok">✓ {vinStatus.ok}. Review the fields below.</p>}
+          {vinStatus.ok && (
+            <p className="mt-2 text-sm font-semibold text-ok">
+              ✓ {vinStatus.ok}. Review the fields below.
+            </p>
+          )}
         </Card>
 
         {/* Basics */}
@@ -206,10 +271,25 @@ export function VehicleForm({
           <FormSectionTitle n={2} title="Basics" />
           <div className="grid gap-4 sm:grid-cols-6">
             <Field label="Year" htmlFor="year" className="sm:col-span-2">
-              <Input id="year" name="year" inputMode="numeric" value={values.year} onChange={set("year")} placeholder="2019" />
+              <Input
+                id="year"
+                name="year"
+                inputMode="numeric"
+                value={values.year}
+                onChange={set("year")}
+                placeholder="2019"
+              />
             </Field>
             <Field label="Make *" htmlFor="make" className="sm:col-span-2">
-              <Input id="make" name="make" list="makes" required value={values.make} onChange={set("make")} placeholder={isBike ? "Honda" : "Toyota"} />
+              <Input
+                id="make"
+                name="make"
+                list="makes"
+                required
+                value={values.make}
+                onChange={set("make")}
+                placeholder={isBike ? "Honda" : "Toyota"}
+              />
               <datalist id="makes">
                 {(isBike ? MOTORCYCLE_MAKES : CAR_MAKES).map((m) => (
                   <option key={m} value={m} />
@@ -217,13 +297,32 @@ export function VehicleForm({
               </datalist>
             </Field>
             <Field label="Model *" htmlFor="model" className="sm:col-span-2">
-              <Input id="model" name="model" required value={values.model} onChange={set("model")} placeholder={isBike ? "CB650R" : "Tacoma"} />
+              <Input
+                id="model"
+                name="model"
+                required
+                value={values.model}
+                onChange={set("model")}
+                placeholder={isBike ? "CB650R" : "Tacoma"}
+              />
             </Field>
             <Field label="Trim" htmlFor="trim" className="sm:col-span-3">
-              <Input id="trim" name="trim" value={values.trim} onChange={set("trim")} placeholder={isBike ? "ABS" : "TRD Off-Road"} />
+              <Input
+                id="trim"
+                name="trim"
+                value={values.trim}
+                onChange={set("trim")}
+                placeholder={isBike ? "ABS" : "TRD Off-Road"}
+              />
             </Field>
             <Field label="Nickname" htmlFor="nickname" className="sm:col-span-3">
-              <Input id="nickname" name="nickname" value={values.nickname} onChange={set("nickname")} placeholder="Daily driver, project car…" />
+              <Input
+                id="nickname"
+                name="nickname"
+                value={values.nickname}
+                onChange={set("nickname")}
+                placeholder="Daily driver, project car…"
+              />
             </Field>
           </div>
         </Card>
@@ -233,30 +332,72 @@ export function VehicleForm({
           <FormSectionTitle n={3} title="Specs" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Engine" htmlFor="engine">
-              <Input id="engine" name="engine" value={values.engine} onChange={set("engine")} placeholder={isBike ? "649cc Inline-4" : "3.5L V6"} />
+              <Input
+                id="engine"
+                name="engine"
+                value={values.engine}
+                onChange={set("engine")}
+                placeholder={isBike ? "649cc Inline-4" : "3.5L V6"}
+              />
             </Field>
             <Field label="Transmission" htmlFor="transmission">
-              <Input id="transmission" name="transmission" value={values.transmission} onChange={set("transmission")} placeholder="6-speed manual" />
+              <Input
+                id="transmission"
+                name="transmission"
+                value={values.transmission}
+                onChange={set("transmission")}
+                placeholder="6-speed manual"
+              />
             </Field>
             {!isBike && (
               <Field label="Drivetrain" htmlFor="drivetrain">
-                <Input id="drivetrain" name="drivetrain" list="drivetrains" value={values.drivetrain} onChange={set("drivetrain")} placeholder="4WD" />
+                <Input
+                  id="drivetrain"
+                  name="drivetrain"
+                  list="drivetrains"
+                  value={values.drivetrain}
+                  onChange={set("drivetrain")}
+                  placeholder="4WD"
+                />
                 <datalist id="drivetrains">
-                  {["FWD", "RWD", "AWD", "4WD"].map((d) => <option key={d} value={d} />)}
+                  {["FWD", "RWD", "AWD", "4WD"].map((d) => (
+                    <option key={d} value={d} />
+                  ))}
                 </datalist>
               </Field>
             )}
             <Field label="Body style" htmlFor="body_style">
-              <Input id="body_style" name="body_style" value={values.body_style} onChange={set("body_style")} placeholder={isBike ? "Naked, Sport, Cruiser…" : "Pickup, Sedan, SUV…"} />
+              <Input
+                id="body_style"
+                name="body_style"
+                value={values.body_style}
+                onChange={set("body_style")}
+                placeholder={isBike ? "Naked, Sport, Cruiser…" : "Pickup, Sedan, SUV…"}
+              />
             </Field>
             <Field label="Fuel" htmlFor="fuel_type">
-              <Input id="fuel_type" name="fuel_type" list="fuels" value={values.fuel_type} onChange={set("fuel_type")} placeholder="Gasoline" />
+              <Input
+                id="fuel_type"
+                name="fuel_type"
+                list="fuels"
+                value={values.fuel_type}
+                onChange={set("fuel_type")}
+                placeholder="Gasoline"
+              />
               <datalist id="fuels">
-                {["Gasoline", "Diesel", "Hybrid", "Plug-in hybrid", "Electric", "E85"].map((f) => <option key={f} value={f} />)}
+                {["Gasoline", "Diesel", "Hybrid", "Plug-in hybrid", "Electric", "E85"].map((f) => (
+                  <option key={f} value={f} />
+                ))}
               </datalist>
             </Field>
             <Field label="Color" htmlFor="color">
-              <Input id="color" name="color" value={values.color} onChange={set("color")} placeholder="Magnetic Gray" />
+              <Input
+                id="color"
+                name="color"
+                value={values.color}
+                onChange={set("color")}
+                placeholder="Magnetic Gray"
+              />
             </Field>
           </div>
         </Card>
@@ -267,8 +408,22 @@ export function VehicleForm({
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Current odometer" htmlFor="odometer">
               <div className="flex gap-2">
-                <Input id="odometer" name="odometer" inputMode="numeric" value={values.odometer} onChange={set("odometer")} placeholder="0" className="font-mono" />
-                <Select name="odometer_unit" value={values.odometer_unit} onChange={set("odometer_unit")} className="w-28 shrink-0" aria-label="Odometer unit">
+                <Input
+                  id="odometer"
+                  name="odometer"
+                  inputMode="numeric"
+                  value={values.odometer}
+                  onChange={set("odometer")}
+                  placeholder="0"
+                  className="font-mono"
+                />
+                <Select
+                  name="odometer_unit"
+                  value={values.odometer_unit}
+                  onChange={set("odometer_unit")}
+                  className="w-28 shrink-0"
+                  aria-label="Odometer unit"
+                >
                   <option value="mi">miles</option>
                   <option value="km">km</option>
                   <option value="hr">hours</option>
@@ -276,16 +431,46 @@ export function VehicleForm({
               </div>
             </Field>
             <Field label="License plate" htmlFor="license_plate">
-              <Input id="license_plate" name="license_plate" value={values.license_plate} onChange={set("license_plate")} className="font-mono tracking-widest uppercase" />
+              <Input
+                id="license_plate"
+                name="license_plate"
+                value={values.license_plate}
+                onChange={set("license_plate")}
+                className="font-mono tracking-widest uppercase"
+              />
             </Field>
             <Field label="Purchase date" htmlFor="purchase_date">
-              <Input id="purchase_date" name="purchase_date" type="date" value={values.purchase_date} onChange={set("purchase_date")} />
+              <Input
+                id="purchase_date"
+                name="purchase_date"
+                type="date"
+                value={values.purchase_date}
+                onChange={set("purchase_date")}
+              />
             </Field>
             <Field label="Purchase price" htmlFor="purchase_price">
-              <Input id="purchase_price" name="purchase_price" inputMode="decimal" value={values.purchase_price} onChange={set("purchase_price")} placeholder="$" />
+              <Input
+                id="purchase_price"
+                name="purchase_price"
+                inputMode="decimal"
+                value={values.purchase_price}
+                onChange={set("purchase_price")}
+                placeholder="$"
+              />
             </Field>
-            <Field label="Odometer at purchase" htmlFor="purchase_odometer" hint="Used to work out your cost per mile.">
-              <Input id="purchase_odometer" name="purchase_odometer" inputMode="numeric" value={values.purchase_odometer} onChange={set("purchase_odometer")} className="font-mono" />
+            <Field
+              label="Odometer at purchase"
+              htmlFor="purchase_odometer"
+              hint="Used to work out your cost per mile."
+            >
+              <Input
+                id="purchase_odometer"
+                name="purchase_odometer"
+                inputMode="numeric"
+                value={values.purchase_odometer}
+                onChange={set("purchase_odometer")}
+                className="font-mono"
+              />
             </Field>
           </div>
         </Card>
@@ -300,7 +485,11 @@ export function VehicleForm({
           {visibleCustomFields.length > 0 && (
             <div className="mb-4 grid gap-4 sm:grid-cols-2">
               {visibleCustomFields.map((f) => (
-                <CustomFieldInput key={f.id} field={f} defaultValue={vehicle?.custom_fields?.[f.id]} />
+                <CustomFieldInput
+                  key={f.id}
+                  field={f}
+                  defaultValue={vehicle?.custom_fields?.[f.id]}
+                />
               ))}
             </div>
           )}
@@ -312,7 +501,13 @@ export function VehicleForm({
 
         <Card className="p-5">
           <Field label="Notes" htmlFor="notes">
-            <Textarea id="notes" name="notes" value={values.notes} onChange={set("notes")} placeholder="Mods, quirks, history…" />
+            <Textarea
+              id="notes"
+              name="notes"
+              value={values.notes}
+              onChange={set("notes")}
+              placeholder="Mods, quirks, history…"
+            />
           </Field>
         </Card>
       </div>
@@ -376,7 +571,12 @@ export function VehicleForm({
           )}
         </Card>
         <ErrorNote>{state?.error}</ErrorNote>
-        <Button type="submit" variant="primary" disabled={pending} className="h-12 w-full text-base">
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={pending}
+          className="h-12 w-full text-base"
+        >
           {pending ? "Saving…" : vehicle ? "Save changes" : "Add to garage"}
         </Button>
       </aside>
@@ -412,7 +612,9 @@ function CustomFieldInput({
         <Select id={name} name={name} defaultValue={value}>
           <option value="">—</option>
           {field.options.map((o) => (
-            <option key={o} value={o}>{o}</option>
+            <option key={o} value={o}>
+              {o}
+            </option>
           ))}
         </Select>
       ) : field.field_type === "boolean" ? (
@@ -459,7 +661,13 @@ export function AddFieldInline({
 
   if (!open) {
     return (
-      <Button type="button" size="sm" variant="ghost" onClick={() => setOpen(true)} className="border border-dashed border-line-strong">
+      <Button
+        type="button"
+        size="sm"
+        variant="ghost"
+        onClick={() => setOpen(true)}
+        className="border border-dashed border-line-strong"
+      >
         <Plus className="size-4" /> Add a field
       </Button>
     );
@@ -506,22 +714,42 @@ export function AddFieldInline({
           />
         </Field>
         <Field label="Type" htmlFor="new-field-type">
-          <Select id="new-field-type" value={fieldType} onChange={(e) => setFieldType(e.target.value as CustomFieldType)}>
+          <Select
+            id="new-field-type"
+            value={fieldType}
+            onChange={(e) => setFieldType(e.target.value as CustomFieldType)}
+          >
             {FIELD_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
             ))}
           </Select>
         </Field>
         <Field label="Show on" htmlFor="new-field-applies">
-          <Select id="new-field-applies" value={appliesTo} onChange={(e) => setAppliesTo(e.target.value as "all" | VehicleType)}>
+          <Select
+            id="new-field-applies"
+            value={appliesTo}
+            onChange={(e) => setAppliesTo(e.target.value as "all" | VehicleType)}
+          >
             <option value="all">All vehicles</option>
             <option value="car">Cars only</option>
             <option value="motorcycle">Motorcycles only</option>
           </Select>
         </Field>
         {fieldType === "select" && (
-          <Field label="Choices" htmlFor="new-field-options" hint="Separate with commas." className="sm:col-span-3">
-            <Input id="new-field-options" value={options} onChange={(e) => setOptions(e.target.value)} placeholder="Summer, Winter, All-season" />
+          <Field
+            label="Choices"
+            htmlFor="new-field-options"
+            hint="Separate with commas."
+            className="sm:col-span-3"
+          >
+            <Input
+              id="new-field-options"
+              value={options}
+              onChange={(e) => setOptions(e.target.value)}
+              placeholder="Summer, Winter, All-season"
+            />
           </Field>
         )}
       </div>

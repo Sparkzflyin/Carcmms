@@ -23,12 +23,25 @@ export function OpenWorkOrderForCode({
   return (
     <div className="ml-auto flex items-center gap-2">
       {vehicles.length > 1 && (
-        <Select value={vehicle} onChange={(e) => setVehicle(e.target.value)} className="h-8 w-auto text-sm" aria-label="Vehicle">
-          {vehicles.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+        <Select
+          value={vehicle}
+          onChange={(e) => setVehicle(e.target.value)}
+          className="h-8 w-auto text-sm"
+          aria-label="Vehicle"
+        >
+          {vehicles.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.label}
+            </option>
+          ))}
         </Select>
       )}
-      <Link href={`/vehicles/${vehicle}/work-orders/new?${params}`} className={buttonClass("secondary", "sm")}>
-        <ClipboardPlus className="size-4" /> Open work order{vehicles.length === 1 ? ` for ${vehicles[0].label}` : ""}
+      <Link
+        href={`/vehicles/${vehicle}/work-orders/new?${params}`}
+        className={buttonClass("secondary", "sm")}
+      >
+        <ClipboardPlus className="size-4" /> Open work order
+        {vehicles.length === 1 ? ` for ${vehicles[0].label}` : ""}
       </Link>
     </div>
   );

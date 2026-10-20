@@ -9,10 +9,25 @@ export function ResetPasswordForm() {
   return (
     <form action={action} className="flex flex-col gap-4">
       <Field label="New password" htmlFor="password" hint="At least 8 characters.">
-        <Input id="password" name="password" type="password" autoComplete="new-password" minLength={8} required autoFocus />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          autoFocus
+        />
       </Field>
       <Field label="Confirm new password" htmlFor="confirm">
-        <Input id="confirm" name="confirm" type="password" autoComplete="new-password" minLength={8} required />
+        <Input
+          id="confirm"
+          name="confirm"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+        />
       </Field>
       <ErrorNote>{state?.error}</ErrorNote>
       <Button variant="primary" type="submit" disabled={pending} className="mt-2 w-full">

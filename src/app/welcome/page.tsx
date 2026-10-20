@@ -70,8 +70,12 @@ export default function WelcomePage() {
             <Wrench className="size-5 text-accent" strokeWidth={2.5} /> GarageLog
           </span>
           <nav className="flex items-center gap-2">
-            <Link href="/login" className={buttonClass("ghost", "sm")}>Sign in</Link>
-            <Link href="/signup" className={buttonClass("primary", "sm")}>Get started</Link>
+            <Link href="/login" className={buttonClass("ghost", "sm")}>
+              Sign in
+            </Link>
+            <Link href="/signup" className={buttonClass("primary", "sm")}>
+              Get started
+            </Link>
           </nav>
         </div>
       </header>
@@ -121,7 +125,9 @@ export default function WelcomePage() {
                     Critical
                   </span>
                 </div>
-                <p className="mt-3 font-display text-2xl font-bold uppercase">Front brake pads + rotors</p>
+                <p className="mt-3 font-display text-2xl font-bold uppercase">
+                  Front brake pads + rotors
+                </p>
                 <p className="text-sm text-ink-3">2019 Toyota Tacoma · 61,240 mi</p>
                 <ul className="mt-4 space-y-1.5 text-sm">
                   {[
@@ -129,9 +135,16 @@ export default function WelcomePage() {
                     ["Rotors ×2", "Ordered", "text-warn"],
                     ["Brake fluid DOT 3", "In stock", "text-ok"],
                   ].map(([part, status, color]) => (
-                    <li key={part} className="flex justify-between gap-4 border-b border-line pb-1.5">
+                    <li
+                      key={part}
+                      className="flex justify-between gap-4 border-b border-line pb-1.5"
+                    >
                       <span>{part}</span>
-                      <span className={`font-display text-xs font-bold tracking-wider uppercase ${color}`}>{status}</span>
+                      <span
+                        className={`font-display text-xs font-bold tracking-wider uppercase ${color}`}
+                      >
+                        {status}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -154,8 +167,12 @@ export default function WelcomePage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6">
-          <h2 className="font-display text-5xl font-extrabold uppercase">Your garage, organized.</h2>
-          <p className="mx-auto mt-3 max-w-lg text-ink-2">Free to start. Add your first vehicle in under a minute.</p>
+          <h2 className="font-display text-5xl font-extrabold uppercase">
+            Your garage, organized.
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-ink-2">
+            Free to start. Add your first vehicle in under a minute.
+          </p>
           <Link href="/signup" className={buttonClass("primary") + " mt-8 h-12 px-8 text-base"}>
             Create your account
           </Link>

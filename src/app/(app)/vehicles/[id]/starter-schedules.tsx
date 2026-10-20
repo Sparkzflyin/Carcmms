@@ -49,15 +49,23 @@ export function StarterSchedules({
   return (
     <Card className="mb-4 overflow-hidden border-accent/50">
       <div className="border-b border-line bg-accent-soft/50 px-4 py-3">
-        <p className="font-display text-lg font-bold tracking-wide uppercase">Recommended maintenance</p>
+        <p className="font-display text-lg font-bold tracking-wide uppercase">
+          Recommended maintenance
+        </p>
         <p className="text-sm text-ink-2">
-          Common intervals for this kind of vehicle. Adjust them to match your owner&apos;s manual. They
-          start counting from today.
+          Common intervals for this kind of vehicle. Adjust them to match your owner&apos;s manual.
+          They start counting from today.
         </p>
       </div>
       <ul className="divide-y divide-line">
         {rows.map((r) => (
-          <li key={r.key} className={cx("flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5", r.exists && "opacity-50")}>
+          <li
+            key={r.key}
+            className={cx(
+              "flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5",
+              r.exists && "opacity-50",
+            )}
+          >
             <label className="flex min-w-48 flex-1 cursor-pointer items-start gap-3">
               <input
                 type="checkbox"

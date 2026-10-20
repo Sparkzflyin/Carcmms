@@ -9,7 +9,10 @@ import { NewWorkOrderForm } from "./form";
 
 export const metadata: Metadata = { title: "New work order" };
 
-export default function NewWorkOrderPage({ params, searchParams }: PageProps<"/vehicles/[id]/work-orders/new">) {
+export default function NewWorkOrderPage({
+  params,
+  searchParams,
+}: PageProps<"/vehicles/[id]/work-orders/new">) {
   return (
     <Suspense fallback={<Skeleton className="h-96" />}>
       <NewWorkOrder params={params} searchParams={searchParams} />
@@ -28,14 +31,21 @@ async function NewWorkOrder({
   const sp = await searchParams;
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
   // Prefill, e.g. from the trouble-code lookup.
-  const defaults = { title: one(sp.title), description: one(sp.description), priority: one(sp.priority) };
+  const defaults = {
+    title: one(sp.title),
+    description: one(sp.description),
+    priority: one(sp.priority),
+  };
   const { supabase } = await requireUser();
   const { data } = await supabase
     .from("vehicles")
     .select("id, year, make, model, odometer, odometer_unit")
     .eq("id", id)
     .maybeSingle();
-  const vehicle = data as Pick<Vehicle, "id" | "year" | "make" | "model" | "odometer" | "odometer_unit"> | null;
+  const vehicle = data as Pick<
+    Vehicle,
+    "id" | "year" | "make" | "model" | "odometer" | "odometer_unit"
+  > | null;
   if (!vehicle) notFound();
 
   return (

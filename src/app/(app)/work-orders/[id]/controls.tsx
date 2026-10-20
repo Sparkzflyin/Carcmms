@@ -45,7 +45,11 @@ export function StatusStepper({ id, status }: { id: string; status: WorkOrderSta
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-panel-2 p-1 sm:grid-cols-4" role="radiogroup" aria-label="Status">
+      <div
+        className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-panel-2 p-1 sm:grid-cols-4"
+        role="radiogroup"
+        aria-label="Status"
+      >
         {FLOW.map((s) => (
           <button
             key={s}
@@ -95,7 +99,10 @@ export function EditDetails({ order }: { order: WorkOrder }) {
   }
 
   return (
-    <form action={action} className="mt-2 flex w-full flex-col gap-4 rounded-md border border-accent/60 bg-panel-2 p-4">
+    <form
+      action={action}
+      className="mt-2 flex w-full flex-col gap-4 rounded-md border border-accent/60 bg-panel-2 p-4"
+    >
       <input type="hidden" name="id" value={order.id} />
       <Field label="Title" htmlFor="e-title">
         <Input id="e-title" name="title" defaultValue={order.title} required />
@@ -107,21 +114,41 @@ export function EditDetails({ order }: { order: WorkOrder }) {
         <Field label="Priority" htmlFor="e-priority">
           <Select id="e-priority" name="priority" defaultValue={order.priority}>
             {Object.entries(PRIORITY_LABELS).map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <option key={v} value={v}>
+                {l}
+              </option>
             ))}
           </Select>
         </Field>
         <Field label="Odometer" htmlFor="e-odo">
-          <Input id="e-odo" name="odometer" inputMode="numeric" defaultValue={order.odometer ?? ""} className="font-mono" />
+          <Input
+            id="e-odo"
+            name="odometer"
+            inputMode="numeric"
+            defaultValue={order.odometer ?? ""}
+            className="font-mono"
+          />
         </Field>
         <Field label="Due by" htmlFor="e-due">
           <Input id="e-due" name="due_date" type="date" defaultValue={order.due_date ?? ""} />
         </Field>
         <Field label="Labor hours" htmlFor="e-hours">
-          <Input id="e-hours" name="labor_hours" inputMode="decimal" defaultValue={order.labor_hours || ""} placeholder="0" />
+          <Input
+            id="e-hours"
+            name="labor_hours"
+            inputMode="decimal"
+            defaultValue={order.labor_hours || ""}
+            placeholder="0"
+          />
         </Field>
         <Field label="Labor rate ($/hr)" htmlFor="e-rate" hint="0 if you're doing it yourself.">
-          <Input id="e-rate" name="labor_rate" inputMode="decimal" defaultValue={order.labor_rate || ""} placeholder="0" />
+          <Input
+            id="e-rate"
+            name="labor_rate"
+            inputMode="decimal"
+            defaultValue={order.labor_rate || ""}
+            placeholder="0"
+          />
         </Field>
       </div>
       <ErrorNote>{state?.error}</ErrorNote>
@@ -137,7 +164,10 @@ export function EditDetails({ order }: { order: WorkOrder }) {
   );
 }
 
-type StockItem = Pick<InventoryItem, "id" | "name" | "part_number" | "quantity" | "unit" | "unit_cost" | "vendor_id">;
+type StockItem = Pick<
+  InventoryItem,
+  "id" | "name" | "part_number" | "quantity" | "unit" | "unit_cost" | "vendor_id"
+>;
 
 export function AddPartForm({
   workOrderId,
@@ -149,7 +179,14 @@ export function AddPartForm({
   vendors: Pick<Vendor, "id" | "name">[];
 }) {
   const [open, setOpen] = useState(false);
-  const empty = { inventory_item_id: "", name: "", part_number: "", vendor: "", unit_cost: "", status: "needed" };
+  const empty = {
+    inventory_item_id: "",
+    name: "",
+    part_number: "",
+    vendor: "",
+    unit_cost: "",
+    status: "needed",
+  };
   const [fields, setFields] = useState(empty);
   const [state, action, pending] = useActionState<FormState, FormData>(async (prev, formData) => {
     const result = await addPart(prev, formData);
@@ -170,7 +207,10 @@ export function AddPartForm({
   }
 
   return (
-    <form action={action} className="mt-3 rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4">
+    <form
+      action={action}
+      className="mt-3 rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4"
+    >
       <input type="hidden" name="work_order_id" value={workOrderId} />
       <div className="grid gap-3 sm:grid-cols-6">
         {stock.length > 0 && (
@@ -178,7 +218,11 @@ export function AddPartForm({
             label="From inventory"
             htmlFor="p-stock"
             className="sm:col-span-6"
-            hint={picked ? `${picked.quantity} ${picked.unit} on the shelf. Adding this part takes it off.` : "Optional: pick something you have on hand."}
+            hint={
+              picked
+                ? `${picked.quantity} ${picked.unit} on the shelf. Adding this part takes it off.`
+                : "Optional: pick something you have on hand."
+            }
           >
             <Select
               id="p-stock"
@@ -203,32 +247,68 @@ export function AddPartForm({
               <option value="">Not from stock: buying it</option>
               {stock.map((i) => (
                 <option key={i.id} value={i.id}>
-                  {i.name}{i.part_number ? ` (${i.part_number})` : ""} · {Number(i.quantity)} {i.unit}
+                  {i.name}
+                  {i.part_number ? ` (${i.part_number})` : ""} · {Number(i.quantity)} {i.unit}
                 </option>
               ))}
             </Select>
           </Field>
         )}
         <Field label="Part *" htmlFor="p-name" className="sm:col-span-3">
-          <Input id="p-name" name="name" required autoFocus value={fields.name} onChange={set("name")} placeholder="Front brake pads" />
+          <Input
+            id="p-name"
+            name="name"
+            required
+            autoFocus
+            value={fields.name}
+            onChange={set("name")}
+            placeholder="Front brake pads"
+          />
         </Field>
         <Field label="Part #" htmlFor="p-num" className="sm:col-span-3">
-          <Input id="p-num" name="part_number" value={fields.part_number} onChange={set("part_number")} className="font-mono" placeholder="D1210" />
+          <Input
+            id="p-num"
+            name="part_number"
+            value={fields.part_number}
+            onChange={set("part_number")}
+            className="font-mono"
+            placeholder="D1210"
+          />
         </Field>
         <Field label="Vendor" htmlFor="p-vendor" className="sm:col-span-2">
-          <Input id="p-vendor" name="vendor" list="part-vendors" value={fields.vendor} onChange={set("vendor")} placeholder="RockAuto" />
-          <datalist id="part-vendors">{vendors.map((v) => <option key={v.id} value={v.name} />)}</datalist>
+          <Input
+            id="p-vendor"
+            name="vendor"
+            list="part-vendors"
+            value={fields.vendor}
+            onChange={set("vendor")}
+            placeholder="RockAuto"
+          />
+          <datalist id="part-vendors">
+            {vendors.map((v) => (
+              <option key={v.id} value={v.name} />
+            ))}
+          </datalist>
         </Field>
         <Field label="Qty" htmlFor="p-qty">
           <Input id="p-qty" name="quantity" inputMode="decimal" defaultValue="1" />
         </Field>
         <Field label="Unit $" htmlFor="p-cost">
-          <Input id="p-cost" name="unit_cost" inputMode="decimal" value={fields.unit_cost} onChange={set("unit_cost")} placeholder="0.00" />
+          <Input
+            id="p-cost"
+            name="unit_cost"
+            inputMode="decimal"
+            value={fields.unit_cost}
+            onChange={set("unit_cost")}
+            placeholder="0.00"
+          />
         </Field>
         <Field label="Status" htmlFor="p-status" className="sm:col-span-2">
           <Select id="p-status" name="status" value={fields.status} onChange={set("status")}>
             {Object.entries(PART_STATUS_LABELS).map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
+              <option key={v} value={v}>
+                {l}
+              </option>
             ))}
           </Select>
         </Field>
@@ -269,7 +349,9 @@ export function PartStatusSelect({ id, status }: { id: string; status: PartStatu
       )}
     >
       {Object.entries(PART_STATUS_LABELS).map(([v, l]) => (
-        <option key={v} value={v}>{l}</option>
+        <option key={v} value={v}>
+          {l}
+        </option>
       ))}
     </select>
   );
@@ -302,11 +384,23 @@ export function DeleteButton({
 }
 
 export function DeletePartButton({ id }: { id: string }) {
-  return <DeleteButton label="Remove part" confirmText="Remove this part?" onDelete={() => deletePart(id)} />;
+  return (
+    <DeleteButton
+      label="Remove part"
+      confirmText="Remove this part?"
+      onDelete={() => deletePart(id)}
+    />
+  );
 }
 
 export function DeleteNoteButton({ id }: { id: string }) {
-  return <DeleteButton label="Delete note" confirmText="Delete this note?" onDelete={() => deleteNote(id)} />;
+  return (
+    <DeleteButton
+      label="Delete note"
+      confirmText="Delete this note?"
+      onDelete={() => deleteNote(id)}
+    />
+  );
 }
 
 export function DeleteWorkOrderButton({ id, vehicleId }: { id: string; vehicleId: string }) {
@@ -339,7 +433,9 @@ export function AddNoteForm({ workOrderId, userId }: { workOrderId: string; user
     for (const { file } of files) {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${userId}/work-orders/${workOrderId}/${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from("photos").upload(path, file, { contentType: file.type });
+      const { error } = await supabase.storage
+        .from("photos")
+        .upload(path, file, { contentType: file.type });
       if (error) return { error: `Photo upload failed: ${error.message}` };
       formData.append("photo_path", path);
     }
@@ -352,7 +448,11 @@ export function AddNoteForm({ workOrderId, userId }: { workOrderId: string; user
   }, undefined);
 
   return (
-    <form ref={formRef} action={action} className="rounded-lg border border-line bg-panel p-3 shadow-card">
+    <form
+      ref={formRef}
+      action={action}
+      className="rounded-lg border border-line bg-panel p-3 shadow-card"
+    >
       <input type="hidden" name="work_order_id" value={workOrderId} />
       <Textarea
         name="body"
@@ -386,7 +486,12 @@ export function AddNoteForm({ workOrderId, userId }: { workOrderId: string; user
         className="hidden"
         onChange={(e) => {
           const picked = Array.from(e.target.files ?? []).filter((f) => f.size <= 10 * 1024 * 1024);
-          setFiles((fs) => [...fs, ...picked.map((file) => ({ file, preview: URL.createObjectURL(file) }))].slice(0, 8));
+          setFiles((fs) =>
+            [...fs, ...picked.map((file) => ({ file, preview: URL.createObjectURL(file) }))].slice(
+              0,
+              8,
+            ),
+          );
           e.target.value = "";
         }}
       />
@@ -430,7 +535,13 @@ export function ArchiveButton({
   );
 }
 
-export function ArchiveAllClosedButton({ vehicleId, count }: { vehicleId?: string; count: number }) {
+export function ArchiveAllClosedButton({
+  vehicleId,
+  count,
+}: {
+  vehicleId?: string;
+  count: number;
+}) {
   const [pending, start] = useTransition();
   return (
     <Button
@@ -438,7 +549,11 @@ export function ArchiveAllClosedButton({ vehicleId, count }: { vehicleId?: strin
       size="sm"
       disabled={pending || count === 0}
       onClick={() => {
-        if (confirm(`Archive ${count} closed work order${count === 1 ? "" : "s"}? You can restore them any time.`)) {
+        if (
+          confirm(
+            `Archive ${count} closed work order${count === 1 ? "" : "s"}? You can restore them any time.`,
+          )
+        ) {
           start(() => archiveClosedWorkOrders(vehicleId));
         }
       }}

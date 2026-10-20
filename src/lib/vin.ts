@@ -21,9 +21,7 @@ const KEEP_UPPER = new Set(["BMW", "GMC", "KTM", "MG", "RAM", "MINI", "BRP", "AM
 function titleCase(value: string) {
   return value
     .split(/(\s|-)/)
-    .map((part) =>
-      KEEP_UPPER.has(part) ? part : part.charAt(0) + part.slice(1).toLowerCase(),
-    )
+    .map((part) => (KEEP_UPPER.has(part) ? part : part.charAt(0) + part.slice(1).toLowerCase()))
     .join("");
 }
 
@@ -55,7 +53,9 @@ export async function decodeVin(raw: string): Promise<DecodedVin | { error: stri
     if (!res.ok) throw new Error(String(res.status));
     row = (await res.json()).Results?.[0] ?? {};
   } catch {
-    return { error: "The VIN lookup service didn't respond. Try again or fill the fields in by hand." };
+    return {
+      error: "The VIN lookup service didn't respond. Try again or fill the fields in by hand.",
+    };
   }
 
   if (!row.Make || !row.Model) {
@@ -70,7 +70,10 @@ export async function decodeVin(raw: string): Promise<DecodedVin | { error: stri
     trim: [row.Trim, row.Series].filter(Boolean).join(" ").trim(),
     body_style: row.BodyClass ?? "",
     engine: describeEngine(row),
-    transmission: [row.TransmissionSpeeds && `${row.TransmissionSpeeds}-speed`, row.TransmissionStyle]
+    transmission: [
+      row.TransmissionSpeeds && `${row.TransmissionSpeeds}-speed`,
+      row.TransmissionStyle,
+    ]
       .filter(Boolean)
       .join(" "),
     drivetrain: row.DriveType ?? "",

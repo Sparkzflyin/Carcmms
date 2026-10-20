@@ -55,7 +55,9 @@ export function WorkOrderChecklist({
 
       {tools.length > 0 && (
         <div>
-          <p className="mb-2 font-display text-xs font-bold tracking-widest text-ink-3 uppercase">Tools & supplies</p>
+          <p className="mb-2 font-display text-xs font-bold tracking-widest text-ink-3 uppercase">
+            Tools & supplies
+          </p>
           <div className="flex flex-wrap gap-2">
             {tools.map((t) => (
               <span
@@ -65,8 +67,17 @@ export function WorkOrderChecklist({
                   t.done ? "border-ok/40 bg-ok-soft text-ok" : "border-line-strong bg-panel",
                 )}
               >
-                <button type="button" onClick={() => toggle(t)} className="inline-flex items-center gap-1.5" aria-pressed={t.done}>
-                  {t.done ? <Check className="size-3.5" /> : <Wrench className="size-3.5 text-ink-3" />}
+                <button
+                  type="button"
+                  onClick={() => toggle(t)}
+                  className="inline-flex items-center gap-1.5"
+                  aria-pressed={t.done}
+                >
+                  {t.done ? (
+                    <Check className="size-3.5" />
+                  ) : (
+                    <Wrench className="size-3.5 text-ink-3" />
+                  )}
                   <span className={cx(t.done && "line-through decoration-ok/50")}>{t.text}</span>
                 </button>
                 <RemoveButton id={t.id} />
@@ -79,7 +90,10 @@ export function WorkOrderChecklist({
       {steps.length > 0 && (
         <ol className="flex flex-col">
           {steps.map((s, n) => (
-            <li key={s.id} className="group flex items-start gap-3 border-b border-line py-2 last:border-0">
+            <li
+              key={s.id}
+              className="group flex items-start gap-3 border-b border-line py-2 last:border-0"
+            >
               <button
                 type="button"
                 role="checkbox"
@@ -93,7 +107,9 @@ export function WorkOrderChecklist({
               >
                 {s.done && <Check className="size-3.5" strokeWidth={3} />}
               </button>
-              <span className="w-5 shrink-0 text-right font-mono text-xs leading-6 text-ink-3">{n + 1}</span>
+              <span className="w-5 shrink-0 text-right font-mono text-xs leading-6 text-ink-3">
+                {n + 1}
+              </span>
               <span className={cx("flex-1", s.done && "text-ink-3 line-through")}>{s.text}</span>
               <RemoveButton id={s.id} />
             </li>
@@ -104,9 +120,18 @@ export function WorkOrderChecklist({
       <div className="flex flex-wrap items-center gap-2">
         {templates.length > 0 ? (
           <>
-            <Select value={template} onChange={(e) => setTemplate(e.target.value)} className="h-8 w-auto min-w-48 text-sm" aria-label="Checklist template">
+            <Select
+              value={template}
+              onChange={(e) => setTemplate(e.target.value)}
+              className="h-8 w-auto min-w-48 text-sm"
+              aria-label="Checklist template"
+            >
               <option value="">Use a saved checklist…</option>
-              {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+              {templates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
             </Select>
             <Button
               type="button"
@@ -123,7 +148,10 @@ export function WorkOrderChecklist({
             </Button>
           </>
         ) : (
-          <Link href="/shop/checklists" className="text-sm font-semibold text-accent hover:underline">
+          <Link
+            href="/shop/checklists"
+            className="text-sm font-semibold text-accent hover:underline"
+          >
             Create reusable checklists in the Shop →
           </Link>
         )}
@@ -161,7 +189,12 @@ function QuickAdd({ workOrderId }: { workOrderId: string }) {
   };
   return (
     <div className="flex gap-2">
-      <Select value={kind} onChange={(e) => setKind(e.target.value as "step" | "tool")} className="h-9 w-24 shrink-0 text-sm" aria-label="Item type">
+      <Select
+        value={kind}
+        onChange={(e) => setKind(e.target.value as "step" | "tool")}
+        className="h-9 w-24 shrink-0 text-sm"
+        aria-label="Item type"
+      >
         <option value="step">Step</option>
         <option value="tool">Tool</option>
       </Select>
@@ -178,7 +211,14 @@ function QuickAdd({ workOrderId }: { workOrderId: string }) {
         className="h-9 text-sm"
         aria-label="New checklist item"
       />
-      <Button type="button" size="sm" onClick={submit} disabled={pending || !value.trim()} className="h-9" aria-label="Add item">
+      <Button
+        type="button"
+        size="sm"
+        onClick={submit}
+        disabled={pending || !value.trim()}
+        className="h-9"
+        aria-label="Add item"
+      >
         <Plus className="size-4" />
       </Button>
     </div>

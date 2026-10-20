@@ -8,12 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { formatOdometer, vehicleName } from "@/lib/format";
 import { maintenanceState } from "@/lib/maintenance";
 import { signPhotoUrls } from "@/lib/storage";
-import {
-  OPEN_STATUSES,
-  type MaintenanceSchedule,
-  type Vehicle,
-  type WorkOrder,
-} from "@/lib/types";
+import { OPEN_STATUSES, type MaintenanceSchedule, type Vehicle, type WorkOrder } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Garage" };
 
@@ -45,20 +40,17 @@ async function Garage() {
       .select("*")
       .eq("archived", false)
       .order("created_at", { ascending: true }),
-    supabase
-      .from("work_orders")
-      .select("vehicle_id, status, priority")
-      .in("status", OPEN_STATUSES),
-    supabase
-      .from("maintenance_schedules")
-      .select("*")
-      .eq("active", true),
+    supabase.from("work_orders").select("vehicle_id, status, priority").in("status", OPEN_STATUSES),
+    supabase.from("maintenance_schedules").select("*").eq("active", true),
   ]);
 
   if (vehiclesRes.error) throw vehiclesRes.error;
   // The client is untyped (no generated DB types yet), so rows come back as `any`.
   const vehicles = vehiclesRes.data as Vehicle[];
-  const openOrders = (ordersRes.data ?? []) as Pick<WorkOrder, "vehicle_id" | "status" | "priority">[];
+  const openOrders = (ordersRes.data ?? []) as Pick<
+    WorkOrder,
+    "vehicle_id" | "status" | "priority"
+  >[];
   const schedules = (schedulesRes.data ?? []) as MaintenanceSchedule[];
 
   if (vehicles.length === 0) {
@@ -127,7 +119,8 @@ async function Garage() {
                 </div>
                 <div className="p-4">
                   <p className="font-mono text-xs tracking-wider text-ink-3 uppercase">
-                    {vehicle.nickname ?? (vehicle.vehicle_type === "motorcycle" ? "Motorcycle" : "Car")}
+                    {vehicle.nickname ??
+                      (vehicle.vehicle_type === "motorcycle" ? "Motorcycle" : "Car")}
                   </p>
                   <h2 className="font-display text-2xl leading-tight font-bold uppercase">
                     {vehicleName(vehicle)}
@@ -186,7 +179,9 @@ function Stat({
 }) {
   return (
     <div className="bg-panel px-4 py-3">
-      <p className="font-display text-xs font-semibold tracking-widest text-ink-3 uppercase">{label}</p>
+      <p className="font-display text-xs font-semibold tracking-widest text-ink-3 uppercase">
+        {label}
+      </p>
       <p
         className={
           "font-display text-4xl font-extrabold " +

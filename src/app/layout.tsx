@@ -21,7 +21,8 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: { default: "GarageLog", template: "%s · GarageLog" },
-  description: "Track your cars and motorcycles, open work orders, and keep maintenance on schedule.",
+  description:
+    "Track your cars and motorcycles, open work orders, and keep maintenance on schedule.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

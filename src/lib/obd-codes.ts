@@ -300,21 +300,64 @@ const CODES: Record<string, string> = {
 
 // Plain-English starting points for the codes people see most.
 const CAUSES: Record<string, string[]> = {
-  P0011: ["Low or dirty engine oil", "Sticking cam phaser / VVT solenoid", "Stretched timing chain"],
+  P0011: [
+    "Low or dirty engine oil",
+    "Sticking cam phaser / VVT solenoid",
+    "Stretched timing chain",
+  ],
   P0101: ["Dirty MAF sensor (try MAF cleaner)", "Air leak after the MAF", "Clogged air filter"],
   P0128: ["Thermostat stuck open", "Faulty coolant temperature sensor", "Low coolant"],
-  P0171: ["Vacuum leak (hoses, intake gasket, PCV)", "Dirty MAF sensor", "Weak fuel pump or clogged filter", "Exhaust leak before the O2 sensor"],
-  P0172: ["Leaking injector", "Dirty or failing MAF sensor", "Fuel pressure too high", "Faulty O2 sensor"],
+  P0171: [
+    "Vacuum leak (hoses, intake gasket, PCV)",
+    "Dirty MAF sensor",
+    "Weak fuel pump or clogged filter",
+    "Exhaust leak before the O2 sensor",
+  ],
+  P0172: [
+    "Leaking injector",
+    "Dirty or failing MAF sensor",
+    "Fuel pressure too high",
+    "Faulty O2 sensor",
+  ],
   P0174: ["Vacuum leak (hoses, intake gasket, PCV)", "Dirty MAF sensor", "Low fuel pressure"],
   P0300: ["Worn spark plugs or bad coil", "Vacuum leak", "Low fuel pressure", "Low compression"],
-  P0301: ["Bad spark plug or coil on that cylinder (swap the coil to test)", "Clogged or leaking injector", "Low compression"],
-  P0302: ["Bad spark plug or coil on that cylinder (swap the coil to test)", "Clogged or leaking injector", "Low compression"],
-  P0303: ["Bad spark plug or coil on that cylinder (swap the coil to test)", "Clogged or leaking injector", "Low compression"],
-  P0304: ["Bad spark plug or coil on that cylinder (swap the coil to test)", "Clogged or leaking injector", "Low compression"],
-  P0335: ["Failed crankshaft position sensor", "Damaged wiring or connector", "Damaged reluctor ring"],
-  P0340: ["Failed camshaft position sensor", "Damaged wiring or connector", "Timing chain/belt jumped"],
+  P0301: [
+    "Bad spark plug or coil on that cylinder (swap the coil to test)",
+    "Clogged or leaking injector",
+    "Low compression",
+  ],
+  P0302: [
+    "Bad spark plug or coil on that cylinder (swap the coil to test)",
+    "Clogged or leaking injector",
+    "Low compression",
+  ],
+  P0303: [
+    "Bad spark plug or coil on that cylinder (swap the coil to test)",
+    "Clogged or leaking injector",
+    "Low compression",
+  ],
+  P0304: [
+    "Bad spark plug or coil on that cylinder (swap the coil to test)",
+    "Clogged or leaking injector",
+    "Low compression",
+  ],
+  P0335: [
+    "Failed crankshaft position sensor",
+    "Damaged wiring or connector",
+    "Damaged reluctor ring",
+  ],
+  P0340: [
+    "Failed camshaft position sensor",
+    "Damaged wiring or connector",
+    "Timing chain/belt jumped",
+  ],
   P0401: ["Carbon-clogged EGR passages or valve", "Faulty EGR valve", "Bad DPFE/EGR sensor"],
-  P0420: ["Worn catalytic converter", "Faulty downstream O2 sensor", "Exhaust leak", "Engine misfire or rich running damaged the cat"],
+  P0420: [
+    "Worn catalytic converter",
+    "Faulty downstream O2 sensor",
+    "Exhaust leak",
+    "Engine misfire or rich running damaged the cat",
+  ],
   P0430: ["Worn catalytic converter", "Faulty downstream O2 sensor", "Exhaust leak"],
   P0440: ["Loose or bad gas cap", "Cracked EVAP hose", "Faulty purge or vent valve"],
   P0442: ["Loose or worn gas cap seal", "Small crack in an EVAP hose", "Leaking purge valve"],
@@ -331,7 +374,10 @@ const CAUSES: Record<string, string[]> = {
 const PATTERN = /^[PBCU][0-3][0-9A-F]{3}$/;
 
 export function normalizeCode(raw: string) {
-  return raw.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return raw
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 }
 
 export function isValidCode(code: string) {
@@ -361,6 +407,20 @@ export function lookupCode(raw: string): CodeInfo | null {
 }
 
 export const COMMON_CODES = [
-  "P0420", "P0300", "P0171", "P0442", "P0455", "P0128", "P0301", "P0101",
-  "P0401", "P0174", "P0011", "P0335", "P0507", "P0562", "P0457", "P0700",
+  "P0420",
+  "P0300",
+  "P0171",
+  "P0442",
+  "P0455",
+  "P0128",
+  "P0301",
+  "P0101",
+  "P0401",
+  "P0174",
+  "P0011",
+  "P0335",
+  "P0507",
+  "P0562",
+  "P0457",
+  "P0700",
 ].map((code) => ({ code, description: CODES[code] }));

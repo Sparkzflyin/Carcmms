@@ -6,11 +6,16 @@ import { Button, ErrorNote, Field, Input } from "@/components/ui";
 import { requestPasswordReset, type AuthState } from "../actions";
 
 export function ForgotPasswordForm() {
-  const [state, action, pending] = useActionState<AuthState, FormData>(requestPasswordReset, undefined);
+  const [state, action, pending] = useActionState<AuthState, FormData>(
+    requestPasswordReset,
+    undefined,
+  );
 
   if (state?.message) {
     return (
-      <div className="rounded-md border border-ok/40 bg-ok-soft px-4 py-3 text-sm text-ok">{state.message}</div>
+      <div className="rounded-md border border-ok/40 bg-ok-soft px-4 py-3 text-sm text-ok">
+        {state.message}
+      </div>
     );
   }
 

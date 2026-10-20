@@ -29,7 +29,6 @@ export function OdometerForm({
     return result;
   }, undefined);
 
-
   if (!editing) {
     return (
       <button
@@ -56,11 +55,21 @@ export function OdometerForm({
   return (
     <form action={action} className="rounded-md border border-accent bg-panel-2 p-3">
       <input type="hidden" name="vehicle_id" value={vehicleId} />
-      <label htmlFor="odo" className="font-display text-xs font-semibold tracking-widest text-ink-3 uppercase">
+      <label
+        htmlFor="odo"
+        className="font-display text-xs font-semibold tracking-widest text-ink-3 uppercase"
+      >
         New reading ({unitLabel(unit)})
       </label>
       <div className="mt-1 flex gap-2">
-        <Input id="odo" name="odometer" inputMode="numeric" defaultValue={odometer} autoFocus className="font-mono" />
+        <Input
+          id="odo"
+          name="odometer"
+          inputMode="numeric"
+          defaultValue={odometer}
+          autoFocus
+          className="font-mono"
+        />
         <Button type="submit" variant="primary" disabled={pending}>
           {pending ? "…" : "Save"}
         </Button>
@@ -118,7 +127,6 @@ export function ScheduleForm({
     return result;
   }, undefined);
 
-
   if (!open) {
     return (
       <Button type="button" size="sm" onClick={() => setOpen(true)}>
@@ -128,7 +136,10 @@ export function ScheduleForm({
   }
 
   return (
-    <form action={action} className="rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4">
+    <form
+      action={action}
+      className="rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4"
+    >
       <input type="hidden" name="vehicle_id" value={vehicleId} />
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Service" htmlFor="s-title" className="sm:col-span-2">
@@ -140,10 +151,23 @@ export function ScheduleForm({
         <Field label="And/or every (months)" htmlFor="s-months">
           <Input id="s-months" name="interval_months" inputMode="numeric" placeholder="6" />
         </Field>
-        <Field label={`Last done at (${unitLabel(unit)})`} htmlFor="s-last-odo" hint="Leave blank if never.">
-          <Input id="s-last-odo" name="last_done_odometer" inputMode="numeric" placeholder={odometer.toLocaleString("en-US")} />
+        <Field
+          label={`Last done at (${unitLabel(unit)})`}
+          htmlFor="s-last-odo"
+          hint="Leave blank if never."
+        >
+          <Input
+            id="s-last-odo"
+            name="last_done_odometer"
+            inputMode="numeric"
+            placeholder={odometer.toLocaleString("en-US")}
+          />
         </Field>
-        <Field label="Last done on" htmlFor="s-last-date" hint="Leave blank to start counting today.">
+        <Field
+          label="Last done on"
+          htmlFor="s-last-date"
+          hint="Leave blank to start counting today."
+        >
           <Input id="s-last-date" name="last_done_date" type="date" />
         </Field>
       </div>

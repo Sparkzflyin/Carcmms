@@ -14,8 +14,8 @@ export default function SettingsPage() {
       <section className="max-w-3xl">
         <SectionTitle>Custom vehicle fields</SectionTitle>
         <p className="mb-4 text-sm text-ink-2">
-          Extra fields that show up on the vehicle form and spec sheet, like tire size, oil
-          weight or insurance renewal date.
+          Extra fields that show up on the vehicle form and spec sheet, like tire size, oil weight
+          or insurance renewal date.
         </p>
         <Suspense fallback={<Skeleton className="h-40" />}>
           <Fields />

@@ -9,7 +9,9 @@ export function VehicleDangerZone({ id, archived }: { id: string; archived: bool
   const [pending, start] = useTransition();
   return (
     <Card className="mt-10 border-danger/30 p-5">
-      <h2 className="font-display text-lg font-bold tracking-wide text-danger uppercase">Danger zone</h2>
+      <h2 className="font-display text-lg font-bold tracking-wide text-danger uppercase">
+        Danger zone
+      </h2>
       <p className="mb-4 text-sm text-ink-2">
         Archiving hides the vehicle from your garage but keeps its history. Deleting removes it and
         every work order for good.

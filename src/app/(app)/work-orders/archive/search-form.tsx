@@ -39,7 +39,9 @@ export function ArchiveSearchForm({
       >
         <option value="">All vehicles</option>
         {vehicles.map((v) => (
-          <option key={v.id} value={v.id}>{v.label}</option>
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
         ))}
       </Select>
       <Select
@@ -54,9 +56,15 @@ export function ArchiveSearchForm({
         <option value="oldest">Oldest first</option>
       </Select>
       <div className="flex gap-2">
-        <Button type="submit" variant="primary" className="flex-1">Search</Button>
+        <Button type="submit" variant="primary" className="flex-1">
+          Search
+        </Button>
         {filtered && (
-          <Link href="/work-orders/archive" className="inline-flex h-10 items-center gap-1 rounded-md px-3 text-sm font-semibold text-ink-2 hover:bg-panel-2" aria-label="Clear search">
+          <Link
+            href="/work-orders/archive"
+            className="inline-flex h-10 items-center gap-1 rounded-md px-3 text-sm font-semibold text-ink-2 hover:bg-panel-2"
+            aria-label="Clear search"
+          >
             <X className="size-4" /> Clear
           </Link>
         )}

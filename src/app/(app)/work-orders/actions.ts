@@ -220,7 +220,11 @@ export async function addNote(_prev: FormState, formData: FormData): Promise<For
 
 export async function deleteNote(id: string) {
   const { supabase } = await requireUser();
-  const { data } = await supabase.from("work_order_notes").select("photo_paths").eq("id", id).single();
+  const { data } = await supabase
+    .from("work_order_notes")
+    .select("photo_paths")
+    .eq("id", id)
+    .single();
   const { error } = await supabase.from("work_order_notes").delete().eq("id", id);
   if (error) throw error;
   if (data?.photo_paths?.length) await supabase.storage.from("photos").remove(data.photo_paths);

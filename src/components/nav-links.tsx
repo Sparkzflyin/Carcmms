@@ -7,11 +7,32 @@ import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 
 const LINKS = [
-  { href: "/", label: "Garage", icon: Warehouse, match: (p: string) => p === "/" || p.startsWith("/vehicles") },
-  { href: "/work-orders", label: "Work orders", short: "Orders", icon: ClipboardList, match: (p: string) => p.startsWith("/work-orders") },
-  { href: "/calendar", label: "Calendar", icon: CalendarDays, match: (p: string) => p.startsWith("/calendar") },
+  {
+    href: "/",
+    label: "Garage",
+    icon: Warehouse,
+    match: (p: string) => p === "/" || p.startsWith("/vehicles"),
+  },
+  {
+    href: "/work-orders",
+    label: "Work orders",
+    short: "Orders",
+    icon: ClipboardList,
+    match: (p: string) => p.startsWith("/work-orders"),
+  },
+  {
+    href: "/calendar",
+    label: "Calendar",
+    icon: CalendarDays,
+    match: (p: string) => p.startsWith("/calendar"),
+  },
   { href: "/shop", label: "Shop", icon: Package, match: (p: string) => p.startsWith("/shop") },
-  { href: "/codes", label: "Codes", icon: ScanSearch, match: (p: string) => p.startsWith("/codes") },
+  {
+    href: "/codes",
+    label: "Codes",
+    icon: ScanSearch,
+    match: (p: string) => p.startsWith("/codes"),
+  },
 ];
 
 type Variant = "top" | "bottom";

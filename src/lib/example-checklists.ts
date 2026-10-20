@@ -8,7 +8,15 @@ export const EXAMPLE_TEMPLATES: Example[] = [
     name: "Oil & filter change (car)",
     description: "Check your manual for oil capacity, grade and drain plug torque.",
     applies_to: "car",
-    tools: ["Socket set", "Oil filter wrench", "Drain pan", "Funnel", "Jack & stands or ramps", "Torque wrench", "Gloves & rags"],
+    tools: [
+      "Socket set",
+      "Oil filter wrench",
+      "Drain pan",
+      "Funnel",
+      "Jack & stands or ramps",
+      "Torque wrench",
+      "Gloves & rags",
+    ],
     steps: [
       "Warm the engine for a few minutes, then shut it off",
       "Raise the car safely on ramps or stands",
@@ -25,7 +33,14 @@ export const EXAMPLE_TEMPLATES: Example[] = [
     name: "Oil & filter change (motorcycle)",
     description: "Use motorcycle-specific oil (JASO MA/MA2) on wet-clutch bikes.",
     applies_to: "motorcycle",
-    tools: ["Socket set", "Oil filter wrench", "Drain pan", "Funnel", "Paddock stand", "Torque wrench"],
+    tools: [
+      "Socket set",
+      "Oil filter wrench",
+      "Drain pan",
+      "Funnel",
+      "Paddock stand",
+      "Torque wrench",
+    ],
     steps: [
       "Warm the engine, then put the bike upright on a stand",
       "Remove the drain plug and drain the oil",
@@ -39,7 +54,15 @@ export const EXAMPLE_TEMPLATES: Example[] = [
     name: "Front brake pads",
     description: "Inspect rotors for minimum thickness while the wheel is off.",
     applies_to: "all",
-    tools: ["Jack & stands", "Lug wrench", "Socket set", "C-clamp or piston tool", "Brake cleaner", "Brake grease", "Torque wrench"],
+    tools: [
+      "Jack & stands",
+      "Lug wrench",
+      "Socket set",
+      "C-clamp or piston tool",
+      "Brake cleaner",
+      "Brake grease",
+      "Torque wrench",
+    ],
     steps: [
       "Loosen the lug nuts, raise the vehicle and remove the wheel",
       "Remove the caliper bolts and hang the caliper; don't let it hang by the hose",
@@ -70,7 +93,8 @@ export const EXAMPLE_TEMPLATES: Example[] = [
   {
     name: "Tire rotation",
     applies_to: "car",
-    description: "Follow the rotation pattern for your tires (directional tires go front-to-back only).",
+    description:
+      "Follow the rotation pattern for your tires (directional tires go front-to-back only).",
     tools: ["Jack & stands", "Lug wrench or impact", "Torque wrench", "Tire pressure gauge"],
     steps: [
       "Loosen lug nuts on all wheels",

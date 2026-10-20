@@ -44,7 +44,10 @@ async function ArchiveResults({
 }) {
   const sp = await searchParams;
   // Strip characters that have meaning in PostgREST filter syntax.
-  const q = param(sp.q).replace(/[,()*%\\"]/g, " ").trim().slice(0, 100);
+  const q = param(sp.q)
+    .replace(/[,()*%\\"]/g, " ")
+    .trim()
+    .slice(0, 100);
   const vehicle = param(sp.vehicle);
   const sortKey = param(sp.sort) in SORTS ? (param(sp.sort) as keyof typeof SORTS) : "archived";
   const sort = SORTS[sortKey];
@@ -100,7 +103,8 @@ async function ArchiveResults({
 
     const clauses = [`title.ilike.${like}`, `description.ilike.${like}`];
     if (number) clauses.push(`number.eq.${number}`);
-    if (matchingVehicles.length) clauses.push(`vehicle_id.in.(${matchingVehicles.map((v) => v.id).join(",")})`);
+    if (matchingVehicles.length)
+      clauses.push(`vehicle_id.in.(${matchingVehicles.map((v) => v.id).join(",")})`);
     if (workOrderIds.size) clauses.push(`id.in.(${[...workOrderIds].join(",")})`);
     query = query.or(clauses.join(","));
   }
@@ -121,13 +125,19 @@ async function ArchiveResults({
         sort={sortKey}
         vehicles={vehicles.map((v) => ({ id: v.id, label: v.nickname ?? vehicleName(v) }))}
       />
-      <p className="mt-4 mb-3 font-mono text-xs tracking-wider text-ink-3 uppercase" aria-live="polite">
+      <p
+        className="mt-4 mb-3 font-mono text-xs tracking-wider text-ink-3 uppercase"
+        aria-live="polite"
+      >
         {total} archived work order{total === 1 ? "" : "s"}
         {filtered && " matching"}
         {total > LIMIT && ` · showing first ${LIMIT}`}
       </p>
       {orders.length === 0 ? (
-        <EmptyState icon={<Archive className="size-8" />} title={filtered ? "No matches" : "Archive is empty"}>
+        <EmptyState
+          icon={<Archive className="size-8" />}
+          title={filtered ? "No matches" : "Archive is empty"}
+        >
           {filtered
             ? "Try a different word, a part number, or a WO number like WO-0042."
             : "Archive closed work orders to clear them out of your lists. They'll be kept here, searchable."}

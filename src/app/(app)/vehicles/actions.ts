@@ -3,7 +3,11 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { EXPENSE_CATEGORY_LABELS, type CustomFieldDefinition, type CustomFieldType } from "@/lib/types";
+import {
+  EXPENSE_CATEGORY_LABELS,
+  type CustomFieldDefinition,
+  type CustomFieldType,
+} from "@/lib/types";
 import { vendorIdForName } from "@/lib/vendors";
 import { decodeVin } from "@/lib/vin";
 
@@ -61,7 +65,7 @@ export async function saveVehicle(_prev: FormState, formData: FormData): Promise
   if (row.year != null && ((row.year as number) < 1885 || (row.year as number) > 2100)) {
     return { error: "That year doesn't look right." };
   }
-  if (row.odometer as number < 0) return { error: "Odometer can't be negative." };
+  if ((row.odometer as number) < 0) return { error: "Odometer can't be negative." };
 
   // Custom field inputs are named "cf:<definition id>".
   const custom: Record<string, string | number | boolean> = {};
@@ -175,7 +179,11 @@ export async function setRecallHandled(vehicleId: string, campaign: string, hand
   const { supabase } = await requireUser();
   const { error } = handled
     ? await supabase.from("recall_dismissals").upsert({ vehicle_id: vehicleId, campaign })
-    : await supabase.from("recall_dismissals").delete().eq("vehicle_id", vehicleId).eq("campaign", campaign);
+    : await supabase
+        .from("recall_dismissals")
+        .delete()
+        .eq("vehicle_id", vehicleId)
+        .eq("campaign", campaign);
   if (error) throw error;
   refresh();
 }

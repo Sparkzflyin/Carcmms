@@ -38,7 +38,11 @@ export default function CodesPage({ searchParams }: PageProps<"/codes">) {
   );
 }
 
-async function CodeLookup({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+async function CodeLookup({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const sp = await searchParams;
   const raw = (Array.isArray(sp.code) ? sp.code[0] : sp.code) ?? "";
   const info = raw ? lookupCode(raw) : null;
@@ -46,9 +50,15 @@ async function CodeLookup({ searchParams }: { searchParams: Promise<Record<strin
 
   const { supabase } = await requireUser();
   const { data } = info
-    ? await supabase.from("vehicles").select("id, year, make, model, nickname").eq("archived", false).order("created_at")
+    ? await supabase
+        .from("vehicles")
+        .select("id, year, make, model, nickname")
+        .eq("archived", false)
+        .order("created_at")
     : { data: null };
-  const vehicles = ((data ?? []) as Pick<Vehicle, "id" | "year" | "make" | "model" | "nickname">[]).map((v) => ({
+  const vehicles = (
+    (data ?? []) as Pick<Vehicle, "id" | "year" | "make" | "model" | "nickname">[]
+  ).map((v) => ({
     id: v.id,
     label: v.nickname ?? vehicleName(v),
   }));
@@ -68,13 +78,15 @@ async function CodeLookup({ searchParams }: { searchParams: Promise<Record<strin
             className="h-12 pl-10 font-mono text-xl tracking-widest uppercase"
           />
         </div>
-        <Button type="submit" variant="primary" className="h-12 px-6">Look up</Button>
+        <Button type="submit" variant="primary" className="h-12 px-6">
+          Look up
+        </Button>
       </Form>
 
       {raw && !info && (
         <p className="mt-4 text-sm text-danger">
-          &ldquo;{raw}&rdquo; isn&apos;t a valid code. Codes look like P0420: a letter (P, B, C or U) then four
-          characters.
+          &ldquo;{raw}&rdquo; isn&apos;t a valid code. Codes look like P0420: a letter (P, B, C or
+          U) then four characters.
         </p>
       )}
 
@@ -88,11 +100,13 @@ async function CodeLookup({ searchParams }: { searchParams: Promise<Record<strin
           </div>
           <div className="flex flex-col gap-4 px-5 py-4">
             {info.description ? (
-              <p className="font-display text-2xl leading-tight font-bold uppercase">{info.description}</p>
+              <p className="font-display text-2xl leading-tight font-bold uppercase">
+                {info.description}
+              </p>
             ) : info.generic ? (
               <p className="text-ink-2">
-                This is a standard code, but it isn&apos;t in our quick-reference list. Use the search link
-                below for its definition.
+                This is a standard code, but it isn&apos;t in our quick-reference list. Use the
+                search link below for its definition.
               </p>
             ) : (
               <p className="text-ink-2">
@@ -114,12 +128,17 @@ async function CodeLookup({ searchParams }: { searchParams: Promise<Record<strin
             </dl>
             {info.causes && (
               <div>
-                <p className="mb-1 font-display text-xs font-bold tracking-widest text-ink-3 uppercase">Common causes</p>
+                <p className="mb-1 font-display text-xs font-bold tracking-widest text-ink-3 uppercase">
+                  Common causes
+                </p>
                 <ul className="list-disc space-y-0.5 pl-5 text-sm">
-                  {info.causes.map((c) => <li key={c}>{c}</li>)}
+                  {info.causes.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
                 </ul>
                 <p className="mt-2 text-xs text-ink-3">
-                  A starting point, not a diagnosis. Check freeze-frame data and any other codes stored with it.
+                  A starting point, not a diagnosis. Check freeze-frame data and any other codes
+                  stored with it.
                 </p>
               </div>
             )}
@@ -133,7 +152,11 @@ async function CodeLookup({ searchParams }: { searchParams: Promise<Record<strin
                 <ExternalLink className="size-4" /> Search for {info.code}
               </a>
               {vehicles.length > 0 && (
-                <OpenWorkOrderForCode code={code} description={info.description} vehicles={vehicles} />
+                <OpenWorkOrderForCode
+                  code={code}
+                  description={info.description}
+                  vehicles={vehicles}
+                />
               )}
             </div>
           </div>

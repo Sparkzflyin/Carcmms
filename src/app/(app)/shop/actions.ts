@@ -55,7 +55,9 @@ export async function saveVendor(_prev: FormState, formData: FormData): Promise<
     ? await supabase.from("vendors").update(row).eq("id", id)
     : await supabase.from("vendors").insert(row);
   if (error) {
-    return { error: error.code === "23505" ? "You already have a vendor with that name." : error.message };
+    return {
+      error: error.code === "23505" ? "You already have a vendor with that name." : error.message,
+    };
   }
   refresh();
   return { ok: true };
@@ -124,7 +126,10 @@ export async function deleteInventoryItem(id: string) {
 // Checklist templates
 // ---------------------------------------------------------------------------
 
-export async function saveChecklistTemplate(_prev: FormState, formData: FormData): Promise<FormState> {
+export async function saveChecklistTemplate(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
   const { supabase } = await requireUser();
   const name = text(formData, "name");
   if (!name) return { error: "Give the checklist a name." };
@@ -184,8 +189,18 @@ export async function applyChecklistTemplate(workOrderId: string, templateId: st
 
   const offset = count ?? 0;
   const rows = [
-    ...(template.tools as string[]).map((t, i) => ({ work_order_id: workOrderId, kind: "tool", text: t, sort_order: offset + i })),
-    ...(template.steps as string[]).map((t, i) => ({ work_order_id: workOrderId, kind: "step", text: t, sort_order: offset + i })),
+    ...(template.tools as string[]).map((t, i) => ({
+      work_order_id: workOrderId,
+      kind: "tool",
+      text: t,
+      sort_order: offset + i,
+    })),
+    ...(template.steps as string[]).map((t, i) => ({
+      work_order_id: workOrderId,
+      kind: "step",
+      text: t,
+      sort_order: offset + i,
+    })),
   ];
   if (rows.length) {
     const { error: insertError } = await supabase.from("work_order_checklist_items").insert(rows);

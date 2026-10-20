@@ -48,39 +48,43 @@ export default function WorkOrderPage({ params }: PageProps<"/work-orders/[id]">
 }
 
 type OrderWithVehicle = WorkOrder & {
-  vehicles: Pick<Vehicle, "id" | "year" | "make" | "model" | "nickname" | "odometer_unit" | "vehicle_type">;
+  vehicles: Pick<
+    Vehicle,
+    "id" | "year" | "make" | "model" | "nickname" | "odometer_unit" | "vehicle_type"
+  >;
 };
 
 async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, user } = await requireUser();
 
-  const [orderRes, partsRes, notesRes, checklistRes, templatesRes, stockRes, vendorsRes] = await Promise.all([
-    supabase
-      .from("work_orders")
-      .select("*, vehicles(id, year, make, model, nickname, odometer_unit, vehicle_type)")
-      .eq("id", id)
-      .maybeSingle(),
-    supabase.from("work_order_parts").select("*").eq("work_order_id", id).order("created_at"),
-    supabase
-      .from("work_order_notes")
-      .select("*")
-      .eq("work_order_id", id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("work_order_checklist_items")
-      .select("*")
-      .eq("work_order_id", id)
-      .order("sort_order")
-      .order("created_at"),
-    supabase.from("checklist_templates").select("id, name, applies_to").order("name"),
-    supabase
-      .from("inventory_items")
-      .select("id, name, part_number, quantity, unit, unit_cost, vendor_id")
-      .gt("quantity", 0)
-      .order("name"),
-    supabase.from("vendors").select("id, name, website").order("name"),
-  ]);
+  const [orderRes, partsRes, notesRes, checklistRes, templatesRes, stockRes, vendorsRes] =
+    await Promise.all([
+      supabase
+        .from("work_orders")
+        .select("*, vehicles(id, year, make, model, nickname, odometer_unit, vehicle_type)")
+        .eq("id", id)
+        .maybeSingle(),
+      supabase.from("work_order_parts").select("*").eq("work_order_id", id).order("created_at"),
+      supabase
+        .from("work_order_notes")
+        .select("*")
+        .eq("work_order_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("work_order_checklist_items")
+        .select("*")
+        .eq("work_order_id", id)
+        .order("sort_order")
+        .order("created_at"),
+      supabase.from("checklist_templates").select("id, name, applies_to").order("name"),
+      supabase
+        .from("inventory_items")
+        .select("id, name, part_number, quantity, unit, unit_cost, vendor_id")
+        .gt("quantity", 0)
+        .order("name"),
+      supabase.from("vendors").select("id, name, website").order("name"),
+    ]);
 
   const order = orderRes.data as OrderWithVehicle | null;
   if (!order) notFound();
@@ -88,20 +92,25 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
   const notes = (notesRes.data ?? []) as WorkOrderNote[];
   const vehicle = order.vehicles;
   const checklist = (checklistRes.data ?? []) as ChecklistItem[];
-  const templates = ((templatesRes.data ?? []) as Pick<ChecklistTemplate, "id" | "name" | "applies_to">[]).filter(
-    (t) => t.applies_to === "all" || t.applies_to === vehicle.vehicle_type,
-  );
+  const templates = (
+    (templatesRes.data ?? []) as Pick<ChecklistTemplate, "id" | "name" | "applies_to">[]
+  ).filter((t) => t.applies_to === "all" || t.applies_to === vehicle.vehicle_type);
   const stock = (stockRes.data ?? []) as Pick<
     InventoryItem,
     "id" | "name" | "part_number" | "quantity" | "unit" | "unit_cost" | "vendor_id"
   >[];
   const vendors = (vendorsRes.data ?? []) as Pick<Vendor, "id" | "name" | "website">[];
   const vendorById = new Map(vendors.map((v) => [v.id, v]));
-  const photos = await signPhotoUrls(supabase, notes.flatMap((n) => n.photo_paths));
+  const photos = await signPhotoUrls(
+    supabase,
+    notes.flatMap((n) => n.photo_paths),
+  );
 
   const partsTotal = parts.reduce((sum, p) => sum + Number(p.quantity) * Number(p.unit_cost), 0);
   const laborTotal = Number(order.labor_hours) * Number(order.labor_rate);
-  const partsOutstanding = parts.filter((p) => p.status === "needed" || p.status === "ordered").length;
+  const partsOutstanding = parts.filter(
+    (p) => p.status === "needed" || p.status === "ordered",
+  ).length;
 
   return (
     <>
@@ -130,7 +139,8 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line-strong bg-panel-2 px-4 py-3">
           <p className="flex items-center gap-2 text-sm text-ink-2">
             <Archive className="size-4" />
-            Archived <LocalTime iso={order.archived_at} />. It&apos;s hidden from your lists but still searchable.
+            Archived <LocalTime iso={order.archived_at} />. It&apos;s hidden from your lists but
+            still searchable.
           </p>
           <div className="w-full sm:w-auto">
             <ArchiveButton id={order.id} archived variant="primary" />
@@ -159,10 +169,14 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
           </section>
 
           <section>
-            <SectionTitle action={<AddPartForm workOrderId={order.id} stock={stock} vendors={vendors} />}>
+            <SectionTitle
+              action={<AddPartForm workOrderId={order.id} stock={stock} vendors={vendors} />}
+            >
               Parts{" "}
               {partsOutstanding > 0 && (
-                <span className="ml-1 font-mono text-sm text-warn">{partsOutstanding} outstanding</span>
+                <span className="ml-1 font-mono text-sm text-warn">
+                  {partsOutstanding} outstanding
+                </span>
               )}
             </SectionTitle>
             {parts.length === 0 ? (
@@ -190,7 +204,12 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                               {p.part_number && <span className="font-mono">{p.part_number}</span>}
                               {p.part_number && p.vendor && " · "}
                               {p.vendor_id && vendorById.get(p.vendor_id)?.website ? (
-                                <a href={vendorById.get(p.vendor_id)!.website!} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                                <a
+                                  href={vendorById.get(p.vendor_id)!.website!}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-accent hover:underline"
+                                >
                                   {p.vendor}
                                 </a>
                               ) : (
@@ -208,7 +227,9 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                           <PartStatusSelect id={p.id} status={p.status} />
                         </td>
                         <td className="px-2 py-2 text-right font-mono">{Number(p.quantity)}</td>
-                        <td className="px-2 py-2 text-right font-mono">{formatMoney(Number(p.unit_cost))}</td>
+                        <td className="px-2 py-2 text-right font-mono">
+                          {formatMoney(Number(p.unit_cost))}
+                        </td>
                         <td className="px-2 py-2 text-right font-mono font-semibold">
                           {formatMoney(Number(p.quantity) * Number(p.unit_cost))}
                         </td>
@@ -237,11 +258,18 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                     aria-hidden
                   />
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-mono text-xs text-ink-3"><LocalTime iso={note.created_at} withTime /></p>
+                    <p className="font-mono text-xs text-ink-3">
+                      <LocalTime iso={note.created_at} withTime />
+                    </p>
                     {note.kind === "note" && <DeleteNoteButton id={note.id} />}
                   </div>
                   {note.body && (
-                    <p className={cx("whitespace-pre-line", note.kind === "status" ? "text-sm text-ink-3 italic" : "text-ink")}>
+                    <p
+                      className={cx(
+                        "whitespace-pre-line",
+                        note.kind === "status" ? "text-sm text-ink-3 italic" : "text-ink",
+                      )}
+                    >
                       {note.body}
                     </p>
                   )}
@@ -252,7 +280,11 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                         return url ? (
                           <a key={path} href={url} target="_blank" rel="noreferrer">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={url} alt="Work order photo" className="size-28 rounded-md border border-line object-cover hover:opacity-90" />
+                            <img
+                              src={url}
+                              alt="Work order photo"
+                              className="size-28 rounded-md border border-line object-cover hover:opacity-90"
+                            />
                           </a>
                         ) : null;
                       })}
@@ -261,8 +293,13 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                 </li>
               ))}
               <li className="relative">
-                <span className="absolute top-1.5 -left-[27px] size-3 rounded-full border-2 border-bg bg-line-strong" aria-hidden />
-                <p className="font-mono text-xs text-ink-3"><LocalTime iso={order.created_at} withTime /></p>
+                <span
+                  className="absolute top-1.5 -left-[27px] size-3 rounded-full border-2 border-bg bg-line-strong"
+                  aria-hidden
+                />
+                <p className="font-mono text-xs text-ink-3">
+                  <LocalTime iso={order.created_at} withTime />
+                </p>
                 <p className="text-sm text-ink-3 italic">Work order opened</p>
               </li>
             </ol>
@@ -272,12 +309,16 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
         <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           <Card className="overflow-hidden">
             <div className="bg-ink px-4 py-3 text-bg">
-              <p className="font-display text-xs font-semibold tracking-widest uppercase opacity-70">Total cost</p>
+              <p className="font-display text-xs font-semibold tracking-widest uppercase opacity-70">
+                Total cost
+              </p>
               <p className="font-mono text-3xl font-bold">{formatMoney(partsTotal + laborTotal)}</p>
             </div>
             <dl className="divide-y divide-line px-4 text-sm">
               <Row label="Parts">{formatMoney(partsTotal)}</Row>
-              <Row label={`Labor (${Number(order.labor_hours)} h × ${formatMoney(Number(order.labor_rate))})`}>
+              <Row
+                label={`Labor (${Number(order.labor_hours)} h × ${formatMoney(Number(order.labor_rate))})`}
+              >
                 {formatMoney(laborTotal)}
               </Row>
             </dl>
@@ -288,12 +329,20 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                 <span className="font-mono">{workOrderNumber(order.number)}</span>
               </Row>
               <Row label="Odometer">
-                <span className="font-mono">{formatOdometer(order.odometer, vehicle.odometer_unit)}</span>
+                <span className="font-mono">
+                  {formatOdometer(order.odometer, vehicle.odometer_unit)}
+                </span>
               </Row>
               <Row label="Due">{formatDate(order.due_date)}</Row>
-              <Row label="Opened"><LocalTime iso={order.created_at} /></Row>
-              <Row label="Started"><LocalTime iso={order.started_at} /></Row>
-              <Row label="Completed"><LocalTime iso={order.completed_at} /></Row>
+              <Row label="Opened">
+                <LocalTime iso={order.created_at} />
+              </Row>
+              <Row label="Started">
+                <LocalTime iso={order.started_at} />
+              </Row>
+              <Row label="Completed">
+                <LocalTime iso={order.completed_at} />
+              </Row>
             </dl>
           </Card>
           {!order.archived_at &&

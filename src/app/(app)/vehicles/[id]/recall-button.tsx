@@ -4,7 +4,15 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui";
 import { setRecallHandled } from "../actions";
 
-export function RecallHandledButton({ vehicleId, campaign, handled }: { vehicleId: string; campaign: string; handled: boolean }) {
+export function RecallHandledButton({
+  vehicleId,
+  campaign,
+  handled,
+}: {
+  vehicleId: string;
+  campaign: string;
+  handled: boolean;
+}) {
   const [pending, start] = useTransition();
   return (
     <Button

@@ -13,7 +13,11 @@ export type Recall = {
 
 // NHTSA recalls by year/make/model. Public data, so it's cached on the server
 // for everyone and refreshed daily.
-export async function getRecalls(year: number, make: string, model: string): Promise<Recall[] | null> {
+export async function getRecalls(
+  year: number,
+  make: string,
+  model: string,
+): Promise<Recall[] | null> {
   "use cache";
   cacheLife("days");
 

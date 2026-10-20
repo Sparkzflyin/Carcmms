@@ -46,7 +46,10 @@ export async function signOut() {
   redirect("/login");
 }
 
-export async function requestPasswordReset(_prev: AuthState, formData: FormData): Promise<AuthState> {
+export async function requestPasswordReset(
+  _prev: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
   const email = String(formData.get("email") ?? "").trim();
   if (!email) return { error: "Enter your email." };
   const origin = (await headers()).get("origin") ?? "";
@@ -61,7 +64,8 @@ export async function requestPasswordReset(_prev: AuthState, formData: FormData)
 export async function updatePassword(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const password = String(formData.get("password") ?? "");
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
-  if (password !== String(formData.get("confirm") ?? "")) return { error: "Passwords don't match." };
+  if (password !== String(formData.get("confirm") ?? ""))
+    return { error: "Passwords don't match." };
 
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();

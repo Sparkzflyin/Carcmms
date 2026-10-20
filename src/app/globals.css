@@ -97,11 +97,7 @@ body {
 
 /* Hazard tape stripe for critical items and the brand mark. */
 .hazard {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    var(--accent) 0 8px,
-    var(--ink) 8px 16px
-  );
+  background-image: repeating-linear-gradient(-45deg, var(--accent) 0 8px, var(--ink) 8px 16px);
 }
 
 /* Staggered page-load reveal. */

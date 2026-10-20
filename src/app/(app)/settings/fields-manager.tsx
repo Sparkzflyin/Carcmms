@@ -8,7 +8,13 @@ import { AddFieldInline } from "../vehicles/vehicle-form";
 import { DeleteButton } from "../work-orders/[id]/controls";
 import { deleteCustomField, renameCustomField } from "./actions";
 
-const TYPE_LABELS = { text: "Text", number: "Number", date: "Date", select: "Dropdown", boolean: "Yes / No" };
+const TYPE_LABELS = {
+  text: "Text",
+  number: "Number",
+  date: "Date",
+  select: "Dropdown",
+  boolean: "Yes / No",
+};
 const APPLIES_LABELS = { all: "All vehicles", car: "Cars", motorcycle: "Motorcycles" };
 
 export function FieldsManager({ fields }: { fields: CustomFieldDefinition[] }) {

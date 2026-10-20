@@ -4,7 +4,13 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { requireUser } from "@/lib/auth";
 import { jobCost, vehicleCosts } from "@/lib/costs";
-import { formatDate, formatMoney, formatOdometer, vehicleName, workOrderNumber } from "@/lib/format";
+import {
+  formatDate,
+  formatMoney,
+  formatOdometer,
+  vehicleName,
+  workOrderNumber,
+} from "@/lib/format";
 import type { Vehicle } from "@/lib/types";
 import { PrintButton } from "./print-button";
 
@@ -29,7 +35,11 @@ async function History({ params }: { params: Promise<{ id: string }> }) {
 
   const { jobs } = await vehicleCosts(supabase, vehicle);
   const total = jobs.reduce((s, j) => s + jobCost(j), 0);
-  const generated = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const generated = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const specs = [
     ["VIN", vehicle.vin],
@@ -43,7 +53,10 @@ async function History({ params }: { params: Promise<{ id: string }> }) {
   return (
     <div className="mx-auto max-w-3xl px-6 py-8 print:max-w-none print:p-0">
       <div className="mb-6 flex items-center justify-between gap-4 print:hidden">
-        <Link href={`/vehicles/${vehicle.id}`} className="text-sm font-semibold text-ink-2 hover:text-accent">
+        <Link
+          href={`/vehicles/${vehicle.id}`}
+          className="text-sm font-semibold text-ink-2 hover:text-accent"
+        >
           ← Back to vehicle
         </Link>
         <PrintButton />
@@ -64,8 +77,8 @@ async function History({ params }: { params: Promise<{ id: string }> }) {
       </header>
 
       <p className="my-4 text-sm text-ink-2">
-        {jobs.length} completed service record{jobs.length === 1 ? "" : "s"} · {formatMoney(total)} in parts and
-        labor · generated {generated}
+        {jobs.length} completed service record{jobs.length === 1 ? "" : "s"} · {formatMoney(total)}{" "}
+        in parts and labor · generated {generated}
       </p>
 
       {jobs.length === 0 ? (
@@ -89,17 +102,25 @@ async function History({ params }: { params: Promise<{ id: string }> }) {
                 </td>
                 <td className="py-2 pr-3">
                   <p className="font-semibold">
-                    {j.title} <span className="font-mono text-xs font-normal text-ink-3">{workOrderNumber(j.number)}</span>
+                    {j.title}{" "}
+                    <span className="font-mono text-xs font-normal text-ink-3">
+                      {workOrderNumber(j.number)}
+                    </span>
                   </p>
                   {j.work_order_parts.length > 0 && (
                     <p className="text-xs text-ink-2">
                       {j.work_order_parts
-                        .map((p) => `${p.name}${p.part_number ? ` (${p.part_number})` : ""}${Number(p.quantity) !== 1 ? ` ×${Number(p.quantity)}` : ""}`)
+                        .map(
+                          (p) =>
+                            `${p.name}${p.part_number ? ` (${p.part_number})` : ""}${Number(p.quantity) !== 1 ? ` ×${Number(p.quantity)}` : ""}`,
+                        )
                         .join(", ")}
                     </p>
                   )}
                 </td>
-                <td className="py-2 text-right font-mono whitespace-nowrap">{jobCost(j) ? formatMoney(jobCost(j)) : "—"}</td>
+                <td className="py-2 text-right font-mono whitespace-nowrap">
+                  {jobCost(j) ? formatMoney(jobCost(j)) : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

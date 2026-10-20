@@ -27,7 +27,9 @@ export function maintenanceState(
   }
 
   if (schedule.interval_months) {
-    const base = new Date(`${schedule.last_done_date ?? schedule.created_at.slice(0, 10)}T00:00:00`);
+    const base = new Date(
+      `${schedule.last_done_date ?? schedule.created_at.slice(0, 10)}T00:00:00`,
+    );
     const next = new Date(base);
     next.setMonth(next.getMonth() + schedule.interval_months);
     daysLeft = Math.ceil((next.getTime() - today.getTime()) / 86_400_000);

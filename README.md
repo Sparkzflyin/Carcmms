@@ -25,20 +25,20 @@ comes due.
 
 ## Layout
 
-| Path | What |
-| --- | --- |
-| `src/app/welcome` | Public landing page (shown at `/` when signed out) |
-| `src/app/(auth)` | Login, signup, forgot/reset password, and auth server actions |
-| `src/app/(app)/page.tsx` | Garage: every vehicle with open work orders and service status |
-| `src/app/(app)/vehicles` | Add/edit vehicle (VIN decode, custom fields, photo), vehicle detail (schedules, recalls), costs |
-| `src/app/(app)/work-orders` | Work order lists, detail (status, checklist, parts from stock, labor, notes, photos), archive search |
-| `src/app/(app)/calendar` | Month view of due work, time-based service, completed jobs and expenses |
-| `src/app/(app)/shop` | Parts inventory, vendors, reusable job checklists |
-| `src/app/(app)/codes` | OBD-II trouble code lookup (`src/lib/obd-codes.ts`) |
-| `src/app/print/vehicles/[id]` | Printable service history |
-| `src/lib/auth.ts` | `requireUser()`: verifies the session; every page and action goes through it |
-| `src/proxy.ts` | Refreshes the Supabase session cookie, shows the landing page or redirects signed-out visitors |
-| `supabase/migrations` | Database schema, RLS, triggers, storage policies |
+| Path                          | What                                                                                                 |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `src/app/welcome`             | Public landing page (shown at `/` when signed out)                                                   |
+| `src/app/(auth)`              | Login, signup, forgot/reset password, and auth server actions                                        |
+| `src/app/(app)/page.tsx`      | Garage: every vehicle with open work orders and service status                                       |
+| `src/app/(app)/vehicles`      | Add/edit vehicle (VIN decode, custom fields, photo), vehicle detail (schedules, recalls), costs      |
+| `src/app/(app)/work-orders`   | Work order lists, detail (status, checklist, parts from stock, labor, notes, photos), archive search |
+| `src/app/(app)/calendar`      | Month view of due work, time-based service, completed jobs and expenses                              |
+| `src/app/(app)/shop`          | Parts inventory, vendors, reusable job checklists                                                    |
+| `src/app/(app)/codes`         | OBD-II trouble code lookup (`src/lib/obd-codes.ts`)                                                  |
+| `src/app/print/vehicles/[id]` | Printable service history                                                                            |
+| `src/lib/auth.ts`             | `requireUser()`: verifies the session; every page and action goes through it                         |
+| `src/proxy.ts`                | Refreshes the Supabase session cookie, shows the landing page or redirects signed-out visitors       |
+| `supabase/migrations`         | Database schema, RLS, triggers, storage policies                                                     |
 
 ## External data
 
