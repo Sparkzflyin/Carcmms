@@ -11,9 +11,10 @@ comes due.
 
 1. **Create a Supabase project** at supabase.com (or add Supabase from the
    Vercel Marketplace on your Vercel project).
-2. **Run the schema:** open the Supabase SQL Editor, paste
-   `supabase/migrations/0001_init.sql`, and run it. This creates the tables,
-   row-level security policies, triggers, and the private `photos` storage bucket.
+2. **Run the schema:** in the Supabase SQL Editor, run each file in
+   `supabase/migrations/` in order (`0001_…`, then `0002_…`, …). This creates
+   the tables, row-level security policies, triggers, and the private `photos`
+   storage bucket. When a new migration is added, run just that file.
 3. **Environment variables:** copy `.env.example` to `.env.local` and fill in the
    URL and key (or run `vercel link && vercel env pull .env.local`).
 4. **Auth URLs:** in Supabase → Authentication → URL Configuration, set the Site
@@ -30,6 +31,7 @@ comes due.
 | `src/app/(app)/page.tsx` | Garage: every vehicle with open work orders and service status |
 | `src/app/(app)/vehicles` | Add/edit vehicle (VIN decode, custom fields, photo) and vehicle detail |
 | `src/app/(app)/work-orders` | All work orders, work order detail (status, parts, labor, notes, photos) |
+| `src/app/(app)/work-orders/archive` | Archived (closed) work orders with search by text, WO number, vehicle, parts, notes |
 | `src/app/(app)/settings` | Manage custom vehicle fields |
 | `src/lib/auth.ts` | `requireUser()`: verifies the session; every page and action goes through it |
 | `src/proxy.ts` | Refreshes the Supabase session cookie and redirects signed-out visitors |

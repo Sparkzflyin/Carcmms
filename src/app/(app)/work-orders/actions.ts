@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import {
+  CLOSED_STATUSES,
   PART_STATUS_LABELS,
   STATUS_LABELS,
   type PartStatus,
@@ -110,6 +111,42 @@ export async function deleteWorkOrder(id: string, vehicleId: string) {
   const paths = (notes ?? []).flatMap((n) => n.photo_paths as string[]);
   if (paths.length) await supabase.storage.from("photos").remove(paths);
   redirect(`/vehicles/${vehicleId}`);
+}
+
+// ---------------------------------------------------------------------------
+// Archive (closed work orders only; the DB enforces this too)
+// ---------------------------------------------------------------------------
+
+export async function archiveWorkOrder(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase
+    .from("work_orders")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id)
+    .in("status", CLOSED_STATUSES);
+  if (error) throw error;
+  refresh();
+}
+
+export async function restoreWorkOrder(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("work_orders").update({ archived_at: null }).eq("id", id);
+  if (error) throw error;
+  refresh();
+}
+
+// Sweep every closed work order (optionally for one vehicle) into the archive.
+export async function archiveClosedWorkOrders(vehicleId?: string) {
+  const { supabase } = await requireUser();
+  let query = supabase
+    .from("work_orders")
+    .update({ archived_at: new Date().toISOString() })
+    .in("status", CLOSED_STATUSES)
+    .is("archived_at", null);
+  if (vehicleId) query = query.eq("vehicle_id", vehicleId);
+  const { error } = await query;
+  if (error) throw error;
+  refresh();
 }
 
 // ---------------------------------------------------------------------------

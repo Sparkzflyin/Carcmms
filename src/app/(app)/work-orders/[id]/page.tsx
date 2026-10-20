@@ -1,4 +1,4 @@
-import { CalendarClock } from "lucide-react";
+import { Archive, CalendarClock } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,6 +18,7 @@ import type { Vehicle, WorkOrder, WorkOrderNote, WorkOrderPart } from "@/lib/typ
 import {
   AddNoteForm,
   AddPartForm,
+  ArchiveButton,
   DeleteNoteButton,
   DeletePartButton,
   DeleteWorkOrderButton,
@@ -91,6 +92,18 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
           )}
         </div>
       </div>
+
+      {order.archived_at && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line-strong bg-panel-2 px-4 py-3">
+          <p className="flex items-center gap-2 text-sm text-ink-2">
+            <Archive className="size-4" />
+            Archived <LocalTime iso={order.archived_at} />. It&apos;s hidden from your lists but still searchable.
+          </p>
+          <div className="w-full sm:w-auto">
+            <ArchiveButton id={order.id} archived variant="primary" />
+          </div>
+        </div>
+      )}
 
       <div className="mb-8">
         <StatusStepper id={order.id} status={order.status} />
@@ -234,6 +247,14 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
               <Row label="Completed"><LocalTime iso={order.completed_at} /></Row>
             </dl>
           </Card>
+          {!order.archived_at &&
+            (order.status === "done" || order.status === "cancelled" ? (
+              <ArchiveButton id={order.id} archived={false} />
+            ) : (
+              <p className="text-center text-xs text-ink-3">
+                Close this work order (Done or Cancelled) to archive it.
+              </p>
+            ))}
           <DeleteWorkOrderButton id={order.id} vehicleId={vehicle.id} />
         </aside>
       </div>

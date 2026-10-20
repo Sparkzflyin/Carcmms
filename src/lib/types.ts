@@ -58,6 +58,7 @@ export type WorkOrder = {
   due_date: string | null;
   started_at: string | null;
   completed_at: string | null;
+  archived_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -119,3 +120,4 @@ export const PART_STATUS_LABELS: Record<PartStatus, string> = {
 };
 
 export const OPEN_STATUSES: WorkOrderStatus[] = ["open", "in_progress", "waiting_parts"];
+export const CLOSED_STATUSES: WorkOrderStatus[] = ["done", "cancelled"];

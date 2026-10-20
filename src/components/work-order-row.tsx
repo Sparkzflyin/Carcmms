@@ -1,4 +1,4 @@
-import { CalendarClock, ChevronRight } from "lucide-react";
+import { Archive, CalendarClock, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { formatDate, workOrderNumber } from "@/lib/format";
 import type { WorkOrder } from "@/lib/types";
@@ -38,6 +38,11 @@ export function WorkOrderRow({
           {order.maintenance_schedule_id && (
             <span className="inline-flex items-center gap-1 text-xs text-ink-3">
               <CalendarClock className="size-3" /> Scheduled
+            </span>
+          )}
+          {order.archived_at && (
+            <span className="inline-flex items-center gap-1 text-xs text-ink-3">
+              <Archive className="size-3" /> Archived
             </span>
           )}
         </div>

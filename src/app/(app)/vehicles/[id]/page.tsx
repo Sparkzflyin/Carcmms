@@ -1,4 +1,4 @@
-import { ClipboardList, Pencil, Plus } from "lucide-react";
+import { Archive, ClipboardList, Pencil, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,6 +17,7 @@ import {
   type Vehicle,
   type WorkOrder,
 } from "@/lib/types";
+import { ArchiveAllClosedButton } from "../../work-orders/[id]/controls";
 import { OdometerForm, ScheduleActions, ScheduleForm } from "./panels";
 
 export const metadata: Metadata = { title: "Vehicle" };
@@ -60,7 +61,8 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
 
   const photos = await signPhotoUrls(supabase, [vehicle.photo_path]);
   const openOrders = orders.filter((o) => OPEN_STATUSES.includes(o.status));
-  const closedOrders = orders.filter((o) => !OPEN_STATUSES.includes(o.status));
+  const closedOrders = orders.filter((o) => !OPEN_STATUSES.includes(o.status) && !o.archived_at);
+  const archivedCount = orders.filter((o) => o.archived_at).length;
   const today = new Date();
   const unit = unitLabel(vehicle.odometer_unit);
 
@@ -237,9 +239,15 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
             )}
           </section>
 
-          {closedOrders.length > 0 && (
+          {(closedOrders.length > 0 || archivedCount > 0) && (
             <section>
-              <SectionTitle>
+              <SectionTitle
+                action={
+                  closedOrders.length > 0 && (
+                    <ArchiveAllClosedButton vehicleId={vehicle.id} count={closedOrders.length} />
+                  )
+                }
+              >
                 History <span className="ml-1 font-mono text-base text-ink-3">{closedOrders.length}</span>
               </SectionTitle>
               <div className="flex flex-col gap-2">
@@ -247,6 +255,14 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
                   <WorkOrderRow key={o.id} order={o} index={i} />
                 ))}
               </div>
+              {archivedCount > 0 && (
+                <Link
+                  href={`/work-orders/archive?vehicle=${vehicle.id}`}
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-2 hover:text-accent"
+                >
+                  <Archive className="size-4" /> {archivedCount} archived work order{archivedCount === 1 ? "" : "s"} →
+                </Link>
+              )}
             </section>
           )}
         </div>

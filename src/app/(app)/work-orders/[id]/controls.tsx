@@ -1,6 +1,6 @@
 "use client";
 
-import { ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Archive, ArchiveRestore, ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
 import { Button, ErrorNote, Field, Input, Select, Textarea, cx } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
@@ -15,10 +15,13 @@ import {
 import {
   addNote,
   addPart,
+  archiveClosedWorkOrders,
+  archiveWorkOrder,
   deleteNote,
   deletePart,
   deleteWorkOrder,
   setPartStatus,
+  restoreWorkOrder,
   setWorkOrderStatus,
   updateWorkOrder,
   type FormState,
@@ -344,5 +347,48 @@ export function AddNoteForm({ workOrderId, userId }: { workOrderId: string; user
         </div>
       </div>
     </form>
+  );
+}
+
+export function ArchiveButton({
+  id,
+  archived,
+  variant = "secondary",
+}: {
+  id: string;
+  archived: boolean;
+  variant?: "secondary" | "primary";
+}) {
+  const [pending, start] = useTransition();
+  return (
+    <Button
+      type="button"
+      size="sm"
+      variant={variant}
+      disabled={pending}
+      className="w-full"
+      onClick={() => start(() => (archived ? restoreWorkOrder(id) : archiveWorkOrder(id)))}
+    >
+      {archived ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
+      {pending ? "…" : archived ? "Restore from archive" : "Archive"}
+    </Button>
+  );
+}
+
+export function ArchiveAllClosedButton({ vehicleId, count }: { vehicleId?: string; count: number }) {
+  const [pending, start] = useTransition();
+  return (
+    <Button
+      type="button"
+      size="sm"
+      disabled={pending || count === 0}
+      onClick={() => {
+        if (confirm(`Archive ${count} closed work order${count === 1 ? "" : "s"}? You can restore them any time.`)) {
+          start(() => archiveClosedWorkOrders(vehicleId));
+        }
+      }}
+    >
+      <Archive className="size-4" /> {pending ? "Archiving…" : "Archive all closed"}
+    </Button>
   );
 }
