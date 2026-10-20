@@ -27,15 +27,26 @@ comes due.
 
 | Path | What |
 | --- | --- |
-| `src/app/(auth)` | Login / signup pages and auth server actions |
+| `src/app/welcome` | Public landing page (shown at `/` when signed out) |
+| `src/app/(auth)` | Login, signup, forgot/reset password, and auth server actions |
 | `src/app/(app)/page.tsx` | Garage: every vehicle with open work orders and service status |
-| `src/app/(app)/vehicles` | Add/edit vehicle (VIN decode, custom fields, photo) and vehicle detail |
-| `src/app/(app)/work-orders` | All work orders, work order detail (status, parts, labor, notes, photos) |
-| `src/app/(app)/work-orders/archive` | Archived (closed) work orders with search by text, WO number, vehicle, parts, notes |
-| `src/app/(app)/settings` | Manage custom vehicle fields |
+| `src/app/(app)/vehicles` | Add/edit vehicle (VIN decode, custom fields, photo), vehicle detail (schedules, recalls), costs |
+| `src/app/(app)/work-orders` | Work order lists, detail (status, checklist, parts from stock, labor, notes, photos), archive search |
+| `src/app/(app)/calendar` | Month view of due work, time-based service, completed jobs and expenses |
+| `src/app/(app)/shop` | Parts inventory, vendors, reusable job checklists |
+| `src/app/(app)/codes` | OBD-II trouble code lookup (`src/lib/obd-codes.ts`) |
+| `src/app/print/vehicles/[id]` | Printable service history |
 | `src/lib/auth.ts` | `requireUser()`: verifies the session; every page and action goes through it |
-| `src/proxy.ts` | Refreshes the Supabase session cookie and redirects signed-out visitors |
+| `src/proxy.ts` | Refreshes the Supabase session cookie, shows the landing page or redirects signed-out visitors |
 | `supabase/migrations` | Database schema, RLS, triggers, storage policies |
+
+## External data
+
+- **VIN decode** and **recalls** come from NHTSA's free public APIs (vPIC and
+  `api.nhtsa.gov/recalls`). Recalls are matched by year/make/model and cached
+  for a day.
+- **Trouble codes** are a curated list of generic SAE J2012 definitions bundled
+  in the app. Manufacturer-specific codes are decoded by structure only.
 
 ## How maintenance reminders work
 

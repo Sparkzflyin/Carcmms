@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
+  const nextParam = searchParams.get("next") ?? "/";
+  // Only same-site relative paths, e.g. /reset-password.
+  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
 
   const supabase = await createClient();
   let ok = false;
@@ -18,5 +21,5 @@ export async function GET(request: NextRequest) {
     ok = !(await supabase.auth.verifyOtp({ token_hash: tokenHash, type })).error;
   }
 
-  return NextResponse.redirect(ok ? `${origin}/` : `${origin}/login?error=link`);
+  return NextResponse.redirect(ok ? `${origin}${next}` : `${origin}/login?error=link`);
 }

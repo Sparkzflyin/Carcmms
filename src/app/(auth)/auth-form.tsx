@@ -32,7 +32,15 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       <Field
         label="Password"
         htmlFor="password"
-        hint={mode === "signup" ? "At least 8 characters." : undefined}
+        hint={
+          mode === "signup" ? (
+            "At least 8 characters."
+          ) : (
+            <Link href="/forgot-password" className="font-semibold text-ink-2 hover:text-accent">
+              Forgot password?
+            </Link>
+          )
+        }
       >
         <Input
           id="password"

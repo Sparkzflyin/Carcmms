@@ -3,7 +3,8 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import type { CustomFieldDefinition, CustomFieldType } from "@/lib/types";
+import { EXPENSE_CATEGORY_LABELS, type CustomFieldDefinition, type CustomFieldType } from "@/lib/types";
+import { vendorIdForName } from "@/lib/vendors";
 import { decodeVin } from "@/lib/vin";
 
 export type FormState = { error?: string } | undefined;
@@ -52,6 +53,7 @@ export async function saveVehicle(_prev: FormState, formData: FormData): Promise
     ? formData.get("odometer_unit")
     : "mi";
   row.purchase_date = text(formData, "purchase_date");
+  row.purchase_odometer = int(formData, "purchase_odometer");
   const price = text(formData, "purchase_price");
   row.purchase_price = price == null ? null : Number(price.replace(/[$,]/g, ""));
 
@@ -130,7 +132,50 @@ export async function createCustomField(input: {
   return { field: data as CustomFieldDefinition };
 }
 
+export type ExpenseState = { error?: string; ok?: boolean } | undefined;
+
+export async function saveExpense(_prev: ExpenseState, formData: FormData): Promise<ExpenseState> {
+  const { supabase } = await requireUser();
+  const amount = text(formData, "amount");
+  const value = amount == null ? NaN : Number(amount.replace(/[$,]/g, ""));
+  if (!Number.isFinite(value) || value < 0) return { error: "Enter an amount." };
+  const category = String(formData.get("category"));
+  const vendor = text(formData, "vendor");
+  const row = {
+    vehicle_id: text(formData, "vehicle_id"),
+    date: text(formData, "date") ?? new Date().toISOString().slice(0, 10),
+    category: category in EXPENSE_CATEGORY_LABELS ? category : "other",
+    amount: value,
+    odometer: int(formData, "odometer"),
+    vendor_id: await vendorIdForName(supabase, vendor),
+    description: text(formData, "description") ?? vendor,
+  };
+  const id = text(formData, "id");
+  const { error } = id
+    ? await supabase.from("expenses").update(row).eq("id", id)
+    : await supabase.from("expenses").insert(row);
+  if (error) return { error: error.message };
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteExpense(id: string) {
+  const { supabase } = await requireUser();
+  const { error } = await supabase.from("expenses").delete().eq("id", id);
+  if (error) throw error;
+  refresh();
+}
+
 export async function lookupVin(vin: string) {
   await requireUser();
   return decodeVin(vin);
+}
+
+export async function setRecallHandled(vehicleId: string, campaign: string, handled: boolean) {
+  const { supabase } = await requireUser();
+  const { error } = handled
+    ? await supabase.from("recall_dismissals").upsert({ vehicle_id: vehicleId, campaign })
+    : await supabase.from("recall_dismissals").delete().eq("vehicle_id", vehicleId).eq("campaign", campaign);
+  if (error) throw error;
+  refresh();
 }

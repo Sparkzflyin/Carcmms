@@ -9,16 +9,26 @@ import { NewWorkOrderForm } from "./form";
 
 export const metadata: Metadata = { title: "New work order" };
 
-export default function NewWorkOrderPage({ params }: PageProps<"/vehicles/[id]/work-orders/new">) {
+export default function NewWorkOrderPage({ params, searchParams }: PageProps<"/vehicles/[id]/work-orders/new">) {
   return (
     <Suspense fallback={<Skeleton className="h-96" />}>
-      <NewWorkOrder params={params} />
+      <NewWorkOrder params={params} searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function NewWorkOrder({ params }: { params: Promise<{ id: string }> }) {
+async function NewWorkOrder({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { id } = await params;
+  const sp = await searchParams;
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
+  // Prefill, e.g. from the trouble-code lookup.
+  const defaults = { title: one(sp.title), description: one(sp.description), priority: one(sp.priority) };
   const { supabase } = await requireUser();
   const { data } = await supabase
     .from("vehicles")
@@ -31,7 +41,7 @@ async function NewWorkOrder({ params }: { params: Promise<{ id: string }> }) {
   return (
     <>
       <PageHeader eyebrow={`${vehicleName(vehicle)} / New`} title="New work order" />
-      <NewWorkOrderForm vehicle={vehicle} />
+      <NewWorkOrderForm vehicle={vehicle} defaults={defaults} />
     </>
   );
 }

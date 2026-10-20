@@ -45,3 +45,28 @@ export async function signOut() {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+export async function requestPasswordReset(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: "Enter your email." };
+  const origin = (await headers()).get("origin") ?? "";
+  const supabase = await createClient();
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+  // Same answer whether or not the account exists, so emails can't be probed.
+  return { message: "If that email has an account, a reset link is on its way. Check your inbox." };
+}
+
+export async function updatePassword(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const password = String(formData.get("password") ?? "");
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+  if (password !== String(formData.get("confirm") ?? "")) return { error: "Passwords don't match." };
+
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  if (!data?.claims) return { error: "Your reset link expired. Request a new one." };
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+  redirect("/");
+}

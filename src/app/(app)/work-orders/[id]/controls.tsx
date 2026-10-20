@@ -1,14 +1,16 @@
 "use client";
 
 import { Archive, ArchiveRestore, ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
-import { useActionState, useEffect, useOptimistic, useRef, useState, useTransition } from "react";
+import { useActionState, useOptimistic, useRef, useState, useTransition } from "react";
 import { Button, ErrorNote, Field, Input, Select, Textarea, cx } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 import {
   PART_STATUS_LABELS,
   PRIORITY_LABELS,
   STATUS_LABELS,
+  type InventoryItem,
   type PartStatus,
+  type Vendor,
   type WorkOrder,
   type WorkOrderStatus,
 } from "@/lib/types";
@@ -135,13 +137,29 @@ export function EditDetails({ order }: { order: WorkOrder }) {
   );
 }
 
-export function AddPartForm({ workOrderId }: { workOrderId: string }) {
+type StockItem = Pick<InventoryItem, "id" | "name" | "part_number" | "quantity" | "unit" | "unit_cost" | "vendor_id">;
+
+export function AddPartForm({
+  workOrderId,
+  stock,
+  vendors,
+}: {
+  workOrderId: string;
+  stock: StockItem[];
+  vendors: Pick<Vendor, "id" | "name">[];
+}) {
   const [open, setOpen] = useState(false);
-  const [state, action, pending] = useActionState<FormState, FormData>(addPart, undefined);
-  const formRef = useRef<HTMLFormElement>(null);
-  useEffect(() => {
-    if (state?.ok) formRef.current?.reset();
-  }, [state]);
+  const empty = { inventory_item_id: "", name: "", part_number: "", vendor: "", unit_cost: "", status: "needed" };
+  const [fields, setFields] = useState(empty);
+  const [state, action, pending] = useActionState<FormState, FormData>(async (prev, formData) => {
+    const result = await addPart(prev, formData);
+    if (result?.ok) setFields(empty);
+    return result;
+  }, undefined);
+  const set = (key: keyof typeof empty) => (e: { target: { value: string } }) =>
+    setFields((f) => ({ ...f, [key]: e.target.value }));
+  const vendorName = (id: string | null) => vendors.find((v) => v.id === id)?.name ?? "";
+  const picked = stock.find((i) => i.id === fields.inventory_item_id);
 
   if (!open) {
     return (
@@ -152,26 +170,63 @@ export function AddPartForm({ workOrderId }: { workOrderId: string }) {
   }
 
   return (
-    <form ref={formRef} action={action} className="mt-3 rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4">
+    <form action={action} className="mt-3 rounded-md border border-dashed border-accent/60 bg-accent-soft/40 p-4">
       <input type="hidden" name="work_order_id" value={workOrderId} />
       <div className="grid gap-3 sm:grid-cols-6">
+        {stock.length > 0 && (
+          <Field
+            label="From inventory"
+            htmlFor="p-stock"
+            className="sm:col-span-6"
+            hint={picked ? `${picked.quantity} ${picked.unit} on the shelf. Adding this part takes it off.` : "Optional: pick something you have on hand."}
+          >
+            <Select
+              id="p-stock"
+              name="inventory_item_id"
+              value={fields.inventory_item_id}
+              onChange={(e) => {
+                const item = stock.find((i) => i.id === e.target.value);
+                setFields(
+                  item
+                    ? {
+                        inventory_item_id: item.id,
+                        name: item.name,
+                        part_number: item.part_number ?? "",
+                        vendor: vendorName(item.vendor_id),
+                        unit_cost: item.unit_cost != null ? String(item.unit_cost) : "",
+                        status: "received",
+                      }
+                    : empty,
+                );
+              }}
+            >
+              <option value="">Not from stock: buying it</option>
+              {stock.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.name}{i.part_number ? ` (${i.part_number})` : ""} · {Number(i.quantity)} {i.unit}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        )}
         <Field label="Part *" htmlFor="p-name" className="sm:col-span-3">
-          <Input id="p-name" name="name" required autoFocus placeholder="Front brake pads" />
+          <Input id="p-name" name="name" required autoFocus value={fields.name} onChange={set("name")} placeholder="Front brake pads" />
         </Field>
         <Field label="Part #" htmlFor="p-num" className="sm:col-span-3">
-          <Input id="p-num" name="part_number" className="font-mono" placeholder="D1210" />
+          <Input id="p-num" name="part_number" value={fields.part_number} onChange={set("part_number")} className="font-mono" placeholder="D1210" />
         </Field>
         <Field label="Vendor" htmlFor="p-vendor" className="sm:col-span-2">
-          <Input id="p-vendor" name="vendor" placeholder="RockAuto" />
+          <Input id="p-vendor" name="vendor" list="part-vendors" value={fields.vendor} onChange={set("vendor")} placeholder="RockAuto" />
+          <datalist id="part-vendors">{vendors.map((v) => <option key={v.id} value={v.name} />)}</datalist>
         </Field>
         <Field label="Qty" htmlFor="p-qty">
           <Input id="p-qty" name="quantity" inputMode="decimal" defaultValue="1" />
         </Field>
         <Field label="Unit $" htmlFor="p-cost">
-          <Input id="p-cost" name="unit_cost" inputMode="decimal" placeholder="0.00" />
+          <Input id="p-cost" name="unit_cost" inputMode="decimal" value={fields.unit_cost} onChange={set("unit_cost")} placeholder="0.00" />
         </Field>
         <Field label="Status" htmlFor="p-status" className="sm:col-span-2">
-          <Select id="p-status" name="status" defaultValue="needed">
+          <Select id="p-status" name="status" value={fields.status} onChange={set("status")}>
             {Object.entries(PART_STATUS_LABELS).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}

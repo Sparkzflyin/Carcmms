@@ -14,7 +14,17 @@ import {
   workOrderNumber,
 } from "@/lib/format";
 import { signPhotoUrls } from "@/lib/storage";
-import type { Vehicle, WorkOrder, WorkOrderNote, WorkOrderPart } from "@/lib/types";
+import type {
+  ChecklistItem,
+  ChecklistTemplate,
+  InventoryItem,
+  Vehicle,
+  Vendor,
+  WorkOrder,
+  WorkOrderNote,
+  WorkOrderPart,
+} from "@/lib/types";
+import { WorkOrderChecklist } from "./checklist";
 import {
   AddNoteForm,
   AddPartForm,
@@ -38,17 +48,17 @@ export default function WorkOrderPage({ params }: PageProps<"/work-orders/[id]">
 }
 
 type OrderWithVehicle = WorkOrder & {
-  vehicles: Pick<Vehicle, "id" | "year" | "make" | "model" | "nickname" | "odometer_unit">;
+  vehicles: Pick<Vehicle, "id" | "year" | "make" | "model" | "nickname" | "odometer_unit" | "vehicle_type">;
 };
 
 async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, user } = await requireUser();
 
-  const [orderRes, partsRes, notesRes] = await Promise.all([
+  const [orderRes, partsRes, notesRes, checklistRes, templatesRes, stockRes, vendorsRes] = await Promise.all([
     supabase
       .from("work_orders")
-      .select("*, vehicles(id, year, make, model, nickname, odometer_unit)")
+      .select("*, vehicles(id, year, make, model, nickname, odometer_unit, vehicle_type)")
       .eq("id", id)
       .maybeSingle(),
     supabase.from("work_order_parts").select("*").eq("work_order_id", id).order("created_at"),
@@ -57,6 +67,19 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
       .select("*")
       .eq("work_order_id", id)
       .order("created_at", { ascending: false }),
+    supabase
+      .from("work_order_checklist_items")
+      .select("*")
+      .eq("work_order_id", id)
+      .order("sort_order")
+      .order("created_at"),
+    supabase.from("checklist_templates").select("id, name, applies_to").order("name"),
+    supabase
+      .from("inventory_items")
+      .select("id, name, part_number, quantity, unit, unit_cost, vendor_id")
+      .gt("quantity", 0)
+      .order("name"),
+    supabase.from("vendors").select("id, name, website").order("name"),
   ]);
 
   const order = orderRes.data as OrderWithVehicle | null;
@@ -64,6 +87,16 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
   const parts = (partsRes.data ?? []) as WorkOrderPart[];
   const notes = (notesRes.data ?? []) as WorkOrderNote[];
   const vehicle = order.vehicles;
+  const checklist = (checklistRes.data ?? []) as ChecklistItem[];
+  const templates = ((templatesRes.data ?? []) as Pick<ChecklistTemplate, "id" | "name" | "applies_to">[]).filter(
+    (t) => t.applies_to === "all" || t.applies_to === vehicle.vehicle_type,
+  );
+  const stock = (stockRes.data ?? []) as Pick<
+    InventoryItem,
+    "id" | "name" | "part_number" | "quantity" | "unit" | "unit_cost" | "vendor_id"
+  >[];
+  const vendors = (vendorsRes.data ?? []) as Pick<Vendor, "id" | "name" | "website">[];
+  const vendorById = new Map(vendors.map((v) => [v.id, v]));
   const photos = await signPhotoUrls(supabase, notes.flatMap((n) => n.photo_paths));
 
   const partsTotal = parts.reduce((sum, p) => sum + Number(p.quantity) * Number(p.unit_cost), 0);
@@ -121,7 +154,12 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
           </section>
 
           <section>
-            <SectionTitle action={<AddPartForm workOrderId={order.id} />}>
+            <SectionTitle>Checklist</SectionTitle>
+            <WorkOrderChecklist workOrderId={order.id} items={checklist} templates={templates} />
+          </section>
+
+          <section>
+            <SectionTitle action={<AddPartForm workOrderId={order.id} stock={stock} vendors={vendors} />}>
               Parts{" "}
               {partsOutstanding > 0 && (
                 <span className="ml-1 font-mono text-sm text-warn">{partsOutstanding} outstanding</span>
@@ -147,11 +185,22 @@ async function WorkOrderDetail({ params }: { params: Promise<{ id: string }> }) 
                       <tr key={p.id}>
                         <td className="px-4 py-2">
                           <p className="font-semibold">{p.name}</p>
-                          {(p.part_number || p.vendor) && (
+                          {(p.part_number || p.vendor || p.inventory_item_id) && (
                             <p className="text-xs text-ink-3">
                               {p.part_number && <span className="font-mono">{p.part_number}</span>}
                               {p.part_number && p.vendor && " · "}
-                              {p.vendor}
+                              {p.vendor_id && vendorById.get(p.vendor_id)?.website ? (
+                                <a href={vendorById.get(p.vendor_id)!.website!} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+                                  {p.vendor}
+                                </a>
+                              ) : (
+                                p.vendor
+                              )}
+                              {p.inventory_item_id && (
+                                <span className="ml-1.5 rounded-sm bg-ok-soft px-1.5 py-px font-display font-bold tracking-wider text-ok uppercase">
+                                  From stock
+                                </span>
+                              )}
                             </p>
                           )}
                         </td>

@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { vendorIdForName } from "@/lib/vendors";
 import {
   CLOSED_STATUSES,
   PART_STATUS_LABELS,
@@ -158,11 +159,15 @@ export async function addPart(_prev: FormState, formData: FormData): Promise<For
   const name = text(formData, "name");
   if (!name) return { error: "Part name is required." };
 
+  const vendor = text(formData, "vendor");
   const { error } = await supabase.from("work_order_parts").insert({
     work_order_id: text(formData, "work_order_id"),
     name,
     part_number: text(formData, "part_number"),
-    vendor: text(formData, "vendor"),
+    vendor,
+    vendor_id: await vendorIdForName(supabase, vendor),
+    // Parts taken from inventory are deducted from stock by a DB trigger.
+    inventory_item_id: text(formData, "inventory_item_id"),
     quantity: num(formData, "quantity") ?? 1,
     unit_cost: num(formData, "unit_cost") ?? 0,
     status: pick(formData.get("status"), PART_STATUSES, "needed"),
@@ -308,6 +313,38 @@ export async function logScheduleDone(scheduleId: string) {
     priority: "low",
     odometer: vehicle?.odometer ?? null,
   });
+  if (error) throw error;
+  refresh();
+}
+
+// Add several schedules at once from the starter list. They start counting
+// from today and the current odometer, so nothing is instantly overdue.
+export async function addStarterSchedules(
+  vehicleId: string,
+  items: { title: string; distance: number | null; months: number | null }[],
+) {
+  const { supabase } = await requireUser();
+  const { data: vehicle, error: readError } = await supabase
+    .from("vehicles")
+    .select("odometer")
+    .eq("id", vehicleId)
+    .single();
+  if (readError) throw readError;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const rows = items
+    .filter((i) => i.title.trim() && ((i.distance ?? 0) > 0 || (i.months ?? 0) > 0))
+    .map((i) => ({
+      vehicle_id: vehicleId,
+      title: i.title.trim(),
+      interval_distance: i.distance && i.distance > 0 ? Math.round(i.distance) : null,
+      interval_months: i.months && i.months > 0 ? Math.round(i.months) : null,
+      last_done_odometer: vehicle.odometer,
+      last_done_date: today,
+    }));
+  if (rows.length === 0) return;
+
+  const { error } = await supabase.from("maintenance_schedules").insert(rows);
   if (error) throw error;
   refresh();
 }

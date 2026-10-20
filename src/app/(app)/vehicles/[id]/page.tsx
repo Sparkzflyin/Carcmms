@@ -1,4 +1,4 @@
-import { Archive, ClipboardList, Pencil, Plus } from "lucide-react";
+import { Archive, ClipboardList, Pencil, Plus, Printer, Receipt } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,7 +8,9 @@ import { WorkOrderRow } from "@/components/work-order-row";
 import { buttonClass, Card, EmptyState, SectionTitle, Skeleton, cx } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { formatDate, formatMoney, formatOdometer, unitLabel, vehicleName } from "@/lib/format";
+import { vehicleCosts } from "@/lib/costs";
 import { maintenanceState } from "@/lib/maintenance";
+import { starterSchedules } from "@/lib/starter-schedules";
 import { signPhotoUrls } from "@/lib/storage";
 import {
   OPEN_STATUSES,
@@ -19,6 +21,8 @@ import {
 } from "@/lib/types";
 import { ArchiveAllClosedButton } from "../../work-orders/[id]/controls";
 import { OdometerForm, ScheduleActions, ScheduleForm } from "./panels";
+import { Recalls } from "./recalls";
+import { StarterSchedules } from "./starter-schedules";
 
 export const metadata: Metadata = { title: "Vehicle" };
 
@@ -59,7 +63,10 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
   const schedules = (schedulesRes.data ?? []) as MaintenanceSchedule[];
   const fields = (fieldsRes.data ?? []) as CustomFieldDefinition[];
 
-  const photos = await signPhotoUrls(supabase, [vehicle.photo_path]);
+  const [photos, costs] = await Promise.all([
+    signPhotoUrls(supabase, [vehicle.photo_path]),
+    vehicleCosts(supabase, vehicle),
+  ]);
   const openOrders = orders.filter((o) => OPEN_STATUSES.includes(o.status));
   const closedOrders = orders.filter((o) => !OPEN_STATUSES.includes(o.status) && !o.archived_at);
   const archivedCount = orders.filter((o) => o.archived_at).length;
@@ -103,7 +110,10 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
           </h1>
           {vehicle.trim && <p className="mt-1 text-lg text-ink-2">{vehicle.trim}</p>}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/print/vehicles/${vehicle.id}`} className={buttonClass("ghost")}>
+            <Printer className="size-4" /> Service history
+          </Link>
           <Link href={`/vehicles/${vehicle.id}/edit`} className={buttonClass("secondary")}>
             <Pencil className="size-4" /> Edit
           </Link>
@@ -125,6 +135,25 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
             />
           </Card>
           <OdometerForm vehicleId={vehicle.id} odometer={vehicle.odometer} unit={vehicle.odometer_unit} />
+          <Link
+            href={`/vehicles/${vehicle.id}/costs`}
+            className="group flex items-center justify-between gap-3 rounded-md border border-line bg-panel px-4 py-3 hover:border-accent"
+          >
+            <span>
+              <span className="block font-display text-xs font-semibold tracking-widest text-ink-3 uppercase">
+                Total spent
+              </span>
+              <span className="font-mono text-2xl font-bold">{formatMoney(costs.total)}</span>
+              {costs.costPerDistance != null && (
+                <span className="ml-2 font-mono text-sm text-ink-3">
+                  {formatMoney(costs.costPerDistance)}/{unit === "hrs" ? "hr" : unit}
+                </span>
+              )}
+            </span>
+            <span className="flex items-center gap-1 text-sm font-semibold text-accent opacity-80 group-hover:opacity-100">
+              <Receipt className="size-4" /> Costs
+            </span>
+          </Link>
           <Card className="p-4">
             <h2 className="mb-3 font-display text-sm font-bold tracking-widest text-ink-3 uppercase">Spec sheet</h2>
             {filledSpecs.length === 0 ? (
@@ -177,6 +206,13 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
             >
               Maintenance schedule
             </SectionTitle>
+            <StarterSchedules
+              vehicleId={vehicle.id}
+              unit={vehicle.odometer_unit}
+              starters={starterSchedules(vehicle.vehicle_type, vehicle.odometer_unit, vehicle.fuel_type)}
+              existingTitles={schedules.map((s) => s.title)}
+              startOpen={schedules.length === 0}
+            />
             {schedules.length === 0 ? (
               <p className="text-sm text-ink-3">
                 Add recurring service like oil changes, chain lube or tire rotations. When one comes
@@ -238,6 +274,10 @@ async function VehicleDetail({ params }: { params: Promise<{ id: string }> }) {
               </ul>
             )}
           </section>
+
+          <Suspense fallback={<Skeleton className="h-24" />}>
+            <Recalls vehicle={vehicle} />
+          </Suspense>
 
           {(closedOrders.length > 0 || archivedCount > 0) && (
             <section>

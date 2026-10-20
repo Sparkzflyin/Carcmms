@@ -10,8 +10,10 @@ const QUICK_TITLES = ["Oil change", "Brake pads", "Tire rotation", "Check engine
 
 export function NewWorkOrderForm({
   vehicle,
+  defaults,
 }: {
   vehicle: Pick<Vehicle, "id" | "odometer" | "odometer_unit">;
+  defaults: { title: string; description: string; priority: string };
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(createWorkOrder, undefined);
 
@@ -20,17 +22,17 @@ export function NewWorkOrderForm({
       <input type="hidden" name="vehicle_id" value={vehicle.id} />
       <Card className="flex flex-col gap-5 p-5 sm:p-6">
         <Field label="What needs doing? *" htmlFor="title">
-          <Input id="title" name="title" required autoFocus placeholder="Replace front brake pads" list="quick-titles" />
+          <Input id="title" name="title" required autoFocus defaultValue={defaults.title} placeholder="Replace front brake pads" list="quick-titles" />
           <datalist id="quick-titles">
             {QUICK_TITLES.map((t) => <option key={t} value={t} />)}
           </datalist>
         </Field>
         <Field label="Details" htmlFor="description">
-          <Textarea id="description" name="description" placeholder="Symptoms, what you've checked, the plan…" />
+          <Textarea id="description" name="description" defaultValue={defaults.description} placeholder="Symptoms, what you've checked, the plan…" />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Priority" htmlFor="priority">
-            <Select id="priority" name="priority" defaultValue="medium">
+            <Select id="priority" name="priority" defaultValue={defaults.priority in PRIORITY_LABELS ? defaults.priority : "medium"}>
               {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}

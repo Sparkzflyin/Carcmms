@@ -124,3 +124,28 @@ body {
     animation: none;
   }
 }
+
+/* Paper: always the light palette, whatever the system theme (print pages). */
+.paper {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f3f2ee;
+  --line: #dddad2;
+  --line-strong: #b5b0a3;
+  --ink: #16181a;
+  --ink-2: #4a4d50;
+  --ink-3: #6f7173;
+  --accent: #d2440f;
+  color-scheme: light;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  @page {
+    margin: 14mm;
+  }
+}

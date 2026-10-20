@@ -30,7 +30,7 @@ const MOTORCYCLE_MAKES = [
 type Values = Record<
   | "nickname" | "year" | "make" | "model" | "trim" | "vin" | "body_style" | "engine"
   | "transmission" | "drivetrain" | "fuel_type" | "color" | "license_plate" | "odometer"
-  | "odometer_unit" | "purchase_date" | "purchase_price" | "notes",
+  | "odometer_unit" | "purchase_date" | "purchase_price" | "purchase_odometer" | "notes",
   string
 >;
 
@@ -54,6 +54,7 @@ function initialValues(v?: Vehicle): Values {
     odometer_unit: v?.odometer_unit ?? "mi",
     purchase_date: s(v?.purchase_date),
     purchase_price: s(v?.purchase_price),
+    purchase_odometer: s(v?.purchase_odometer),
     notes: s(v?.notes),
   };
 }
@@ -282,6 +283,9 @@ export function VehicleForm({
             </Field>
             <Field label="Purchase price" htmlFor="purchase_price">
               <Input id="purchase_price" name="purchase_price" inputMode="decimal" value={values.purchase_price} onChange={set("purchase_price")} placeholder="$" />
+            </Field>
+            <Field label="Odometer at purchase" htmlFor="purchase_odometer" hint="Used to work out your cost per mile.">
+              <Input id="purchase_odometer" name="purchase_odometer" inputMode="numeric" value={values.purchase_odometer} onChange={set("purchase_odometer")} className="font-mono" />
             </Field>
           </div>
         </Card>
