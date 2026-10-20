@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import clsx, { type ClassValue } from "clsx";
 import type { ComponentProps, ReactNode } from "react";
 import {
   PRIORITY_LABELS,
@@ -7,7 +7,24 @@ import {
   type WorkOrderStatus,
 } from "@/lib/types";
 
-export { clsx as cx };
+import { extendTailwindMerge } from "tailwind-merge";
+
+// Our theme defines custom shadow and font utilities; tell tailwind-merge so it
+// doesn't treat e.g. `font-display` and `font-bold` as conflicting.
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      shadow: [{ shadow: ["card"] }],
+      "font-family": [{ font: ["display", "mono", "sans"] }],
+    },
+  },
+});
+
+// Join class names, letting later classes override earlier conflicting ones
+// (so a component's `className="w-28"` beats its default `w-full`).
+export function cx(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -33,7 +50,7 @@ export function Button({
   className,
   ...props
 }: ComponentProps<"button"> & { variant?: ButtonVariant; size?: "sm" | "md" }) {
-  return <button className={clsx(buttonClass(variant, size), className)} {...props} />;
+  return <button className={cx(buttonClass(variant, size), className)} {...props} />;
 }
 
 export const controlClass = clsx(
@@ -44,15 +61,15 @@ export const controlClass = clsx(
 );
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={clsx(controlClass, "h-10", className)} {...props} />;
+  return <input className={cx(controlClass, "h-10", className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
-  return <textarea className={clsx(controlClass, "min-h-24", className)} {...props} />;
+  return <textarea className={cx(controlClass, "min-h-24", className)} {...props} />;
 }
 
 export function Select({ className, ...props }: ComponentProps<"select">) {
-  return <select className={clsx(controlClass, "h-10 pr-8", className)} {...props} />;
+  return <select className={cx(controlClass, "h-10 pr-8", className)} {...props} />;
 }
 
 export function Field({
@@ -69,7 +86,7 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div className={clsx("flex flex-col gap-1.5", className)}>
+    <div className={cx("flex flex-col gap-1.5", className)}>
       <label
         htmlFor={htmlFor}
         className="font-display text-[13px] font-semibold tracking-[0.08em] text-ink-2 uppercase"
@@ -85,7 +102,7 @@ export function Field({
 export function Card({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={clsx("rounded-lg border border-line bg-panel shadow-card", className)}
+      className={cx("rounded-lg border border-line bg-panel shadow-card", className)}
       {...props}
     />
   );
@@ -135,7 +152,7 @@ const STATUS_STYLES: Record<WorkOrderStatus, string> = {
 export function StatusBadge({ status }: { status: WorkOrderStatus }) {
   return (
     <span
-      className={clsx(
+      className={cx(
         "inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 font-display text-xs font-bold tracking-wider uppercase",
         STATUS_STYLES[status],
       )}
@@ -157,7 +174,7 @@ export function PriorityBadge({ priority }: { priority: WorkOrderPriority }) {
   const bars = { low: 1, medium: 2, high: 3, critical: 4 }[priority];
   return (
     <span
-      className={clsx(
+      className={cx(
         "inline-flex items-center gap-1.5 font-display text-xs font-bold tracking-wider uppercase",
         PRIORITY_STYLES[priority],
       )}
@@ -167,7 +184,7 @@ export function PriorityBadge({ priority }: { priority: WorkOrderPriority }) {
         {[1, 2, 3, 4].map((n) => (
           <span
             key={n}
-            className={clsx("w-[3px] rounded-[1px]", n <= bars ? "bg-current" : "bg-line")}
+            className={cx("w-[3px] rounded-[1px]", n <= bars ? "bg-current" : "bg-line")}
             style={{ height: 3 + n * 2 }}
           />
         ))}
@@ -196,7 +213,7 @@ export function EmptyState({
 }
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={clsx("animate-pulse rounded-md bg-panel-2", className)} />;
+  return <div className={cx("animate-pulse rounded-md bg-panel-2", className)} />;
 }
 
 export function ErrorNote({ children }: { children: ReactNode }) {
